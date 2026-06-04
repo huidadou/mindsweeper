@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mindsweeper — End-to-end flow</title>
+<title>Mindsweeper: End-to-end flow</title>
 <style>
   :root {
     --bg: #fbfaf6;
@@ -58,7 +58,7 @@
     font-size: 13px;
     margin: 0 0 18px;
   }
-
+ 
   /* Flow nodes */
   .row { display: flex; justify-content: center; align-items: flex-start; gap: 16px; flex-wrap: wrap; }
   .row + .arrow { margin: 4px 0; }
@@ -75,7 +75,7 @@
   }
   .node .title { font-weight: 600; }
   .node .subtitle { font-size: 11.5px; color: var(--ink-muted); margin-top: 4px; }
-
+ 
   .node.purple { border-color: #AFA9EC; background: #EEEDFE; color: #3C3489; }
   .node.purple .subtitle { color: #534AB7; }
   .node.teal { border-color: #5DCAA5; background: #E1F5EE; color: #085041; }
@@ -104,7 +104,7 @@
     vertical-align: middle;
   }
   .node .badge.num { background: #534AB7; }
-
+ 
   /* Shared blackboard — a data store, not an agent: dashed to set it apart */
   .blackboard {
     max-width: 660px;
@@ -118,7 +118,7 @@
   }
   .blackboard .title { font-weight: 600; font-size: 14px; }
   .blackboard .subtitle { font-size: 11.5px; color: #5f5e5a; margin-top: 4px; }
-
+ 
   .arrow { display: flex; justify-content: center; color: var(--ink-faint); }
   .arrow.center::after { content: '↓'; font-size: 18px; }
   .arrow.updown::after { content: '↕'; font-size: 18px; }
@@ -128,7 +128,7 @@
     font-family: var(--mono);
     text-align: center;
   }
-
+ 
   .branch-arrows {
     display: flex;
     justify-content: space-around;
@@ -140,7 +140,7 @@
     margin-right: auto;
   }
   .branch-arrows span { width: 33.3%; text-align: center; }
-
+ 
   .lane-row {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
@@ -154,7 +154,7 @@
     gap: 12px;
   }
   .lane-row .node { width: 100%; min-width: auto; }
-
+ 
   .unified-report {
     max-width: 380px;
     margin: 0 auto;
@@ -181,7 +181,7 @@
     font-size: 12.5px;
     color: #2a5546;
   }
-
+ 
   footer {
     margin-top: 50px;
     padding-top: 18px;
@@ -199,7 +199,7 @@
     border: 1px solid var(--border);
     color: var(--ink-muted);
   }
-
+ 
   .print-note {
     margin: 20px 0 0;
     padding: 12px 16px;
@@ -215,154 +215,211 @@
     .print-note { display: none; }
     .node, .unified-report { box-shadow: none !important; }
   }
-
+ 
+  /* TWO-LANE SPLIT */
+  .two-lane { display: grid; grid-template-columns: 1fr 28px 1fr; max-width: 880px; margin: 16px auto 0; }
+  .lane { display: flex; flex-direction: column; align-items: center; gap: 0; padding-bottom: 16px; }
+  .lane-label { font-family: var(--mono); font-size: 9.5px; letter-spacing: 2px; text-transform: uppercase; color: var(--ink-muted); font-weight: 600; margin-bottom: 14px; padding: 4px 14px; border: 1px solid var(--border); border-radius: 20px; background: var(--surface); }
+  .lane .node { width: 100%; max-width: 310px; }
+  .lane .arrow { width: 100%; max-width: 310px; }
+  .lane-divider { display: flex; align-items: stretch; justify-content: center; }
+  .lane-divider::after { content: ''; width: 1px; background: var(--border); display: block; }
+  .lane-inner { width: 100%; max-width: 310px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+  .lane-inner .node { min-width: auto; font-size: 11px; padding: 7px 7px; }
+  .lane-inner .node .title { font-size: 11px; }
+  .lane-inner .node .subtitle { font-size: 10px; }
+  .lane-merge { text-align: center; font-family: var(--mono); font-size: 11px; color: var(--ink-muted); margin: 16px auto 4px; padding-top: 16px; border-top: 1px dashed var(--border); max-width: 600px; }
+ 
   @media (max-width: 720px) {
     .lane-row, .lane-row.four { grid-template-columns: 1fr; }
     .row { flex-direction: column; align-items: center; }
+    .two-lane { grid-template-columns: 1fr; }
+    .lane-divider { display: none; }
+    .lane-inner { grid-template-columns: 1fr; }
   }
 </style>
 </head>
 <body>
 <div class="container">
-
+ 
 <header>
   <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:20px;">
     <a href="./index.html" style="font-family:var(--mono);font-size:11px;color:var(--ink-muted);text-decoration:none;letter-spacing:0.5px;display:flex;align-items:center;gap:6px;transition:color .15s;" onmouseover="this.style.color='#0F6E56'" onmouseout="this.style.color=''">← mindsweeper.sg</a>
     <a href="./Mindsweeper_Teacher_Console_1.html" target="_blank" style="font-family:var(--mono);font-size:11px;color:var(--ink-muted);text-decoration:none;letter-spacing:0.5px;display:flex;align-items:center;gap:6px;transition:color .15s;" onmouseover="this.style.color='#0F6E56'" onmouseout="this.style.color=''">View demo dashboard →</a>
   </div>
-  <h1>Mindsweeper — end-to-end flow</h1>
+  <h1>Mindsweeper: end-to-end flow</h1>
   <div class="sub">From multi-agent assessment to three-audience report</div>
-  <div class="meta">v0.3 · 2026-06-04 · Multi-agent architecture reference</div>
+  <div class="meta">v0.4 · 2026-06-04 · Multi-agent architecture reference · 7 agents</div>
 </header>
-
+ 
 <!-- STAGE 1: COLLECTION -->
 <section class="stage">
   <div class="stage-label">Stage 1 · Agent app</div>
   <h2 class="stage-title">Evidence collection</h2>
-  <p class="stage-desc">The React app that gathers raw evidence. Three roles, three input modes, branches based on what the user has. Each branch produces evidence — not a finished report.</p>
-
+  <p class="stage-desc">Two entry paths into the same assessment engine. Students complete a live Socratic session directly; the Orchestrator runs the conversation in real time. Parents and teachers upload existing materials (portfolio, transcript, or both). Both paths produce structured evidence for the blackboard.</p>
+ 
   <div class="row"><div class="node">Landing</div></div>
   <div class="arrow center"></div>
   <div class="row"><div class="node purple"><div class="title">Role select</div><div class="subtitle">Student · Parent · Teacher</div></div></div>
-  <div class="arrow center"></div>
-  <div class="row"><div class="node">Intake</div></div>
-  <div class="arrow center"></div>
-  <div class="row"><div class="node">Confirm details</div></div>
-  <div class="arrow center"></div>
-  <div class="row"><div class="node purple"><div class="title">Input choice</div><div class="subtitle">Parent / Teacher only</div></div></div>
-
-  <div class="arrow note">Student → skips input_choice, goes straight to live chat + portfolio</div>
-
-  <div class="lane-row" style="margin-top: 12px;">
-    <div class="node teal featured"><div class="title">Both <span class="badge">REC</span></div><div class="subtitle">PDF + transcript</div></div>
-    <div class="node"><div class="title">Written only</div><div class="subtitle">PDF, no chat</div></div>
-    <div class="node"><div class="title">Conversation only</div><div class="subtitle">Transcript, no PDF</div></div>
+ 
+  <div class="two-lane">
+ 
+    <!-- STUDENT LANE -->
+    <div class="lane">
+      <div class="lane-label">Student</div>
+      <div class="node"><div class="title">Intake</div><div class="subtitle">grade · syllabus · confidence · goal</div></div>
+      <div class="arrow center"></div>
+      <div class="node"><div class="title">Confirm details</div></div>
+      <div class="arrow note" style="font-size:10px;text-align:center;margin:4px 0;width:100%;max-width:310px">(skips input choice)</div>
+      <div class="node teal featured"><div class="title">Live Socratic session</div><div class="subtitle">Orchestrator-driven · real-time probing</div></div>
+      <div class="arrow center"></div>
+      <div class="node blue"><div class="title">Portfolio upload</div><div class="subtitle">past work · optional</div></div>
+      <div class="arrow center"></div>
+      <div class="node teal"><div class="title">Evidence bundle</div><div class="subtitle">live chat + portfolio</div></div>
+    </div>
+ 
+    <!-- DIVIDER -->
+    <div class="lane-divider"></div>
+ 
+    <!-- PARENT / TEACHER LANE -->
+    <div class="lane">
+      <div class="lane-label">Parent / Teacher</div>
+      <div class="node"><div class="title">Intake</div><div class="subtitle">student details · context</div></div>
+      <div class="arrow center"></div>
+      <div class="node"><div class="title">Confirm details</div></div>
+      <div class="arrow center"></div>
+      <div class="node purple"><div class="title">Input choice</div></div>
+      <div class="arrow center"></div>
+      <div class="lane-inner">
+        <div class="node teal"><div class="title">Both <span class="badge">REC</span></div><div class="subtitle">PDF + transcript</div></div>
+        <div class="node"><div class="title">Written only</div><div class="subtitle">PDF, no chat</div></div>
+        <div class="node"><div class="title">Chat only</div><div class="subtitle">transcript only</div></div>
+      </div>
+      <div class="arrow center"></div>
+      <div class="lane-inner">
+        <div class="node blue"><div class="title">Portfolio upload</div></div>
+        <div class="node blue"><div class="title">Portfolio upload</div></div>
+        <div class="node coral"><div class="title">Transcript upload</div></div>
+      </div>
+      <div class="arrow center"></div>
+      <div class="lane-inner">
+        <div class="node coral"><div class="title">+ Transcript upload</div></div>
+        <div class="node faded"><div class="title">(skip chat)</div></div>
+        <div class="node faded"><div class="title">(no portfolio)</div></div>
+      </div>
+      <div class="arrow center"></div>
+      <div class="lane-inner">
+        <div class="node teal"><div class="title">Evidence bundle</div><div class="subtitle">PDF + transcript</div></div>
+        <div class="node amber"><div class="title">PDF only</div><div class="subtitle">gaps flagged</div></div>
+        <div class="node teal"><div class="title">Transcript only</div></div>
+      </div>
+    </div>
+ 
   </div>
-
-  <div class="branch-arrows"><span>↓</span><span>↓</span><span>↓</span></div>
-
-  <div class="lane-row">
-    <div class="node blue"><div class="title">Portfolio upload</div></div>
-    <div class="node blue"><div class="title">Portfolio upload</div></div>
-    <div class="node coral"><div class="title">Transcript upload</div></div>
-  </div>
-
-  <div class="branch-arrows"><span>↓</span><span>↓</span><span></span></div>
-
-  <div class="lane-row">
-    <div class="node coral"><div class="title">Transcript upload</div></div>
-    <div class="node faded"><div class="title">(skip chat)</div></div>
-    <div class="node faded"><div class="title">(no portfolio)</div></div>
-  </div>
-
-  <div class="branch-arrows"><span>↓</span><span>↓</span><span>↓</span></div>
-
-  <div class="lane-row">
-    <div class="node teal"><div class="title">Evidence bundle</div><div class="subtitle">portfolio + transcript</div></div>
-    <div class="node amber"><div class="title">Evidence: portfolio</div><div class="subtitle">requires_chat → gaps flagged</div></div>
-    <div class="node teal"><div class="title">Evidence: transcript</div><div class="subtitle">dialogue only</div></div>
-  </div>
-
-  <div class="arrow note" style="margin-top: 14px;">all evidence streams converge → assessment engine</div>
+ 
+  <div class="lane-merge">both paths converge · all evidence streams → assessment engine</div>
   <div class="arrow center"></div>
 </section>
-
+ 
 <!-- STAGE 2: MULTI-AGENT ENGINE -->
 <section class="stage">
   <div class="stage-label">Stage 2 · Assessment engine</div>
-  <h2 class="stage-title">Six agents, one blackboard</h2>
-  <p class="stage-desc">Evidence from any mode is normalised into a shared student model. Four assessors read and write it; the orchestrator drives live probing and assembles the report; the planner turns the profile into intervention.</p>
-
+  <h2 class="stage-title">Seven agents, one blackboard</h2>
+  <p class="stage-desc">Evidence from any mode is normalised and written to a shared student model. Portfolio evidence passes through a dedicated ingestion agent before reaching the blackboard. Four assessors read and write simultaneously; the orchestrator drives live probing and assembles the report; the planner turns the profile into a targeted intervention.</p>
+ 
   <!-- Three evidence sources -->
   <div class="lane-row">
     <div class="node teal"><div class="title">Live Socratic chat</div><div class="subtitle">real-time probing</div></div>
     <div class="node teal"><div class="title">Portfolio analysis</div><div class="subtitle">uploaded work, PDFs</div></div>
     <div class="node teal"><div class="title">Offline transcript</div><div class="subtitle">prior dialogue</div></div>
   </div>
-
-  <div class="arrow note" style="margin-top: 10px;">writes evidence ↓ · sources triangulate every finding</div>
-
-  <!-- Blackboard -->
-  <div class="blackboard">
-    <div class="title">Shared student model — the blackboard</div>
-    <div class="subtitle">every agent reads &amp; writes here · the system of record, not an agent</div>
-  </div>
-
-  <div class="arrow updown" style="margin-top: 6px;"></div>
-  <div class="arrow note">read evidence · write findings + confidence + open gaps</div>
-
-  <!-- Four assessors -->
-  <div class="lane-row four" style="margin-top: 10px;">
-    <div class="node purple"><div class="title">Knowledge &amp; Skill</div><div class="subtitle">mastery · errors · transfer</div></div>
-    <div class="node purple"><div class="title">Mindset &amp; Motivation</div><div class="subtitle">drivers · growth vs fixed</div></div>
-    <div class="node purple"><div class="title">Resilience &amp; Affect</div><div class="subtitle">persistence · anxiety</div></div>
-    <div class="node purple"><div class="title">Metacognition &amp; Comms</div><div class="subtitle">calibration · explaining</div></div>
-  </div>
-
-  <div class="arrow note" style="margin-top: 10px;">OCEAN is not owned by any one assessor — the orchestrator derives it from logged behaviour</div>
+ 
+  <div class="arrow note" style="margin-top: 10px;">live chat + transcript write directly to blackboard · portfolio passes through ingestion agent first</div>
   <div class="arrow center"></div>
-
-  <!-- Orchestrator -->
+ 
+  <!-- Portfolio Ingestion Agent -->
   <div class="row">
-    <div class="node blue featured" style="min-width: 320px;">
-      <div class="title">Orchestrator <span class="badge num">5 of 6</span></div>
-      <div class="subtitle">runs the live loop · derives OCEAN · assembles the report</div>
+    <div class="node blue" style="min-width: 320px;">
+      <div class="title">Portfolio Ingestion Agent <span class="badge num">5 of 7</span></div>
+      <div class="subtitle">OCR + step extraction · crossings-out → resilience signals · schema: {question_ref, steps[], corrections[], ocr_confidence}</div>
     </div>
   </div>
-
-  <div class="arrow note" style="margin-top: 8px;">↻ live mode only: reads open gaps → picks the single next probe → back to live chat</div>
+ 
+  <div class="arrow note" style="margin-top: 8px;">structured evidence ↓ · low-confidence OCR flagged; orchestrator down-weights accordingly</div>
+ 
+  <!-- Blackboard -->
+  <div class="blackboard">
+    <div class="title">Shared student model: the blackboard</div>
+    <div class="subtitle">every agent reads &amp; writes here · the system of record, not an agent</div>
+  </div>
+ 
+  <div class="arrow updown" style="margin-top: 6px;"></div>
+  <div class="arrow note">read evidence · write findings + confidence + open gaps</div>
+ 
+  <!-- Four assessors -->
+  <div class="lane-row four" style="margin-top: 10px;">
+    <div class="node purple">
+      <div class="title">Knowledge &amp; Skill <span class="badge num">1</span></div>
+      <div class="subtitle">mastery · errors · transfer · SAP Coherence Map</div>
+    </div>
+    <div class="node purple">
+      <div class="title">Mindset &amp; Motivation <span class="badge num">2</span></div>
+      <div class="subtitle">SDT spectrum · growth vs fixed · Dweck (2006)</div>
+    </div>
+    <div class="node purple">
+      <div class="title">Resilience &amp; Affect <span class="badge num">3</span></div>
+      <div class="subtitle">cliff vs slope · anxiety · Yeager &amp; Dweck (2012)</div>
+    </div>
+    <div class="node purple">
+      <div class="title">Metacognition &amp; Comms <span class="badge num">4</span></div>
+      <div class="subtitle">calibration gap · ICAP · Flavell (1979)</div>
+    </div>
+  </div>
+ 
+  <div class="arrow note" style="margin-top: 10px;">OCEAN is derived by the Orchestrator from behavioural primitives logged across all four assessors</div>
   <div class="arrow center"></div>
-
+ 
+  <!-- Orchestrator -->
+  <div class="row">
+    <div class="node blue featured" style="min-width: 340px;">
+      <div class="title">Orchestrator <span class="badge num">6 of 7</span></div>
+      <div class="subtitle">runs the live loop · reads open gaps · derives OCEAN · assembles the report · amotivation interrupt</div>
+    </div>
+  </div>
+ 
+  <div class="arrow note" style="margin-top: 8px;">↻ live mode only: reads open gaps → picks single next probe type (Reasoning / Perturbation / Teaching / Calibration) → back to live chat</div>
+  <div class="arrow center"></div>
+ 
   <!-- Intervention planner -->
   <div class="row">
-    <div class="node amber" style="min-width: 320px;">
-      <div class="title">Intervention planner <span class="badge num">6 of 6</span></div>
-      <div class="subtitle">Stage-2 work · 8-week plan: knowledge · mindset · habit · problem-solving</div>
+    <div class="node amber" style="min-width: 340px;">
+      <div class="title">Intervention Planner <span class="badge num">7 of 7</span></div>
+      <div class="subtitle">SDT-gated strategies · topological sort of prerequisite graph · LVN strategy library · ANet decomposition</div>
     </div>
   </div>
 </section>
-
+ 
 <!-- STAGE 3: UNIFIED REPORT -->
 <section class="stage">
   <div class="stage-label">Stage 3 · Unified report</div>
   <h2 class="stage-title">One report, one data contract</h2>
   <p class="stage-desc">The orchestrator merges each assessor's region of the blackboard into a single JSON report, written to <code style="font-family: var(--mono); font-size: 11.5px;">localStorage</code> as a bridge between the agent app and the teacher console.</p>
-
+ 
   <div class="unified-report">
     <div class="title">One unified report</div>
     <div class="code">localStorage.mindsweeper:latestReport</div>
     <div class="desc">Knowledge map + Mathematical character (incl. OCEAN) + Intervention plan + Narrative summary</div>
   </div>
 </section>
-
+ 
 <!-- STAGE 4: TEACHER CONSOLE -->
 <section class="stage">
   <div class="stage-label">Stage 4 · Teacher console</div>
-  <h2 class="stage-title">Report viewer — three audience views</h2>
+  <h2 class="stage-title">Report viewer: three audience views</h2>
   <p class="stage-desc">Same underlying data, three voices. Each view shows / hides / rephrases sections based on the audience. Switched via toggle in the topbar.</p>
-
+ 
   <div class="arrow note">Toggle view in topbar →</div>
-
+ 
   <div class="lane-row">
     <div class="node green">
       <div class="title">Student view</div>
@@ -393,21 +450,21 @@
     </div>
   </div>
 </section>
-
+ 
 <div class="print-note">
-  <strong>To share this:</strong> save the file (Ctrl/Cmd + S), email or upload directly. Or print to PDF (Ctrl/Cmd + P). The diagram is self-contained — no external assets, no scripts.
+  <strong>To share this:</strong> save the file (Ctrl/Cmd + S), email or upload directly. Or print to PDF (Ctrl/Cmd + P). The diagram is self-contained: no external assets, no scripts.
 </div>
-
+ 
 <footer>
-  Six agents · one blackboard · one data contract · <code>localStorage</code> bridge<br>
+  Seven agents · one blackboard · one data contract · <code>localStorage</code> bridge<br>
   Collect evidence → assessment engine → unified report → Teacher console displays<br>
   <div style="margin-top:14px;display:flex;justify-content:center;gap:28px;flex-wrap:wrap;">
     <a href="./index.html" style="font-family:var(--mono);font-size:10.5px;color:var(--ink-faint);text-decoration:none;letter-spacing:0.5px;" onmouseover="this.style.color='#0F6E56'" onmouseout="this.style.color=''">← Homepage</a>
     <a href="./Mindsweeper_Teacher_Console_1.html" target="_blank" style="font-family:var(--mono);font-size:10.5px;color:var(--ink-faint);text-decoration:none;letter-spacing:0.5px;" onmouseover="this.style.color='#0F6E56'" onmouseout="this.style.color=''">Demo dashboard →</a>
   </div>
-  <span style="opacity: 0.7; font-size: 10.5px; letter-spacing: 0.5px; font-family: var(--mono); margin-top: 6px; display: inline-block;">MINDSWEEPER · v0.3 ARCHITECTURE</span>
+  <span style="opacity: 0.7; font-size: 10.5px; letter-spacing: 0.5px; font-family: var(--mono); margin-top: 6px; display: inline-block;">MINDSWEEPER · v0.4 ARCHITECTURE</span>
 </footer>
-
+ 
 </div>
 </body>
 </html>
