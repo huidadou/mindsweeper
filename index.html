@@ -20,7 +20,7 @@
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
 body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.65;-webkit-font-smoothing:antialiased;overflow-x:hidden}
- 
+
 /* NAV */
 nav{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:0 40px;height:60px;background:rgba(251,250,246,.94);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
 .nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink);font-family:var(--mono);font-size:12px;font-weight:700;letter-spacing:2px}
@@ -30,7 +30,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;align-items:cen
 .nav-links a:hover{color:var(--teal)}
 .nav-btn{padding:8px 18px;background:var(--teal);color:#fff;font-family:var(--mono);font-size:10.5px;font-weight:700;letter-spacing:.5px;text-decoration:none;border-radius:3px;transition:background .15s;box-shadow:inset -1px -2px 0 rgba(0,0,0,.2),inset 1px 1px 0 rgba(255,255,255,.15)}
 .nav-btn:hover{background:#0c5c46}
- 
+
 /* HERO */
 #hero{position:relative;min-height:100vh;display:flex;align-items:center;justify-content:center;overflow:hidden;padding-top:60px}
 #hg{position:absolute;inset:0;overflow:hidden;display:grid;gap:2px;grid-template-columns:repeat(var(--gc),36px);grid-template-rows:repeat(var(--gr),36px);justify-content:center;align-content:center;pointer-events:none;opacity:.5}
@@ -40,7 +40,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;align-items:cen
 .hn{background:var(--cell-d);box-shadow:inset 1px 1px 0 #b0aea6;border:1px solid #c2c0b8}
 .hm{background:var(--cell-d);box-shadow:inset 1px 1px 0 #b0aea6;border:1px solid #c2c0b8;color:var(--teal);font-size:13px}
 .n1{color:var(--n1)}.n2{color:var(--n2)}.n3{color:var(--n3)}.n4{color:var(--n4)}.n5{color:var(--n5)}.n6{color:var(--n6)}
- 
+
 .card{position:relative;z-index:10;max-width:710px;margin:40px 20px;padding:56px 52px;background:rgba(251,250,246,.91);backdrop-filter:blur(6px);border:1px solid rgba(224,221,214,.8);border-radius:2px;box-shadow:inset -3px -3px 0 rgba(176,174,166,.3),inset 3px 3px 0 rgba(255,255,255,.7),0 24px 80px rgba(15,110,86,.08),0 4px 20px rgba(0,0,0,.07);text-align:center;animation:fadeUp .7s ease .2s both}
 .glyph{font-size:24px;color:var(--teal);letter-spacing:7px;margin-bottom:14px;font-family:var(--mono)}
 .eyebrow{font-family:var(--mono);font-size:9.5px;letter-spacing:3.5px;text-transform:uppercase;color:var(--ink-faint);margin-bottom:28px}
@@ -54,7 +54,7 @@ h1{font-family:var(--serif);font-size:clamp(34px,5vw,58px);font-style:italic;fon
 .bs:hover{border-color:var(--teal);color:var(--teal)}
 .tags{font-family:var(--mono);font-size:9.5px;color:var(--ink-faint);letter-spacing:1.5px}
 .tags span{margin:0 7px;opacity:.35}
- 
+
 /* SECTION SHELL */
 .wrap{max-width:1040px;margin:0 auto;padding:0 40px}
 section{padding:96px 0}
@@ -62,7 +62,7 @@ section{padding:96px 0}
 .st{font-family:var(--serif);font-size:clamp(28px,4vw,44px);font-weight:600;letter-spacing:-.02em;line-height:1.18;color:var(--ink);margin-bottom:14px}
 .ss{font-size:16.5px;color:var(--ink-muted);max-width:520px;line-height:1.75}
 .sh{margin-bottom:56px}
- 
+
 /* HOW */
 #how{background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
 .phase{display:grid;grid-template-columns:60px 1fr;gap:36px;align-items:start;padding:40px 0;border-bottom:1px dashed var(--border)}
@@ -79,7 +79,7 @@ section{padding:96px 0}
 .arch-lnk{display:inline-flex;align-items:center;gap:8px;margin-top:40px;font-family:var(--mono);font-size:9.5px;letter-spacing:2px;color:var(--ink-faint);text-decoration:none;text-transform:uppercase;transition:color .15s}
 .arch-lnk:hover{color:var(--teal)}
 .arch-lnk::after{content:'→';font-size:12px}
- 
+
 /* VIDEO */
 #video{background:var(--bg)}
 .vwrap{max-width:860px;margin:0 auto}
@@ -91,7 +91,7 @@ section{padding:96px 0}
 .vtag{font-family:var(--mono);font-size:10px;letter-spacing:3px;color:rgba(93,202,165,.6);text-transform:uppercase}
 .vtitle{font-family:var(--serif);font-size:19px;font-style:italic;color:rgba(255,255,255,.75);text-align:center}
 .vtrail{margin-top:22px;text-align:center;font-family:var(--mono);font-size:9px;letter-spacing:2px;color:var(--ink-faint);text-transform:uppercase}
- 
+
 /* DASHBOARD */
 #dashboard{background:var(--surface);border-top:1px solid var(--border)}
 .dg{display:grid;grid-template-columns:1fr 1.1fr;gap:72px;align-items:center}
@@ -113,7 +113,7 @@ section{padding:96px 0}
 .dcta{padding:12px 22px;background:var(--teal);color:#fff;font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.5px;text-decoration:none;border-radius:3px;transition:background .15s;box-shadow:inset -2px -2px 0 rgba(0,0,0,.18),inset 1px 1px 0 rgba(255,255,255,.15)}
 .dcta:hover{background:#0c5c46}
 .dhint{font-family:var(--mono);font-size:9.5px;color:var(--ink-faint);letter-spacing:.5px}
- 
+
 /* FOOTER */
 footer{padding:32px 40px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:20px}
 .flogo{display:flex;align-items:center;gap:9px;font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:2px;color:var(--ink-faint);text-decoration:none}
@@ -122,8 +122,8 @@ footer{padding:32px 40px;border-top:1px solid var(--border);display:flex;align-i
 .flinks a{font-family:var(--mono);font-size:10px;color:var(--ink-faint);text-decoration:none;letter-spacing:.5px;transition:color .15s}
 .flinks a:hover{color:var(--teal)}
 .fcopy{width:100%;font-family:var(--mono);font-size:9.5px;color:var(--ink-faint);letter-spacing:.5px;border-top:1px solid var(--border);padding-top:18px}
- 
- 
+
+
 /* AGENT GRID */
 .agt-intro{font-family:var(--mono);font-size:9px;letter-spacing:2.5px;text-transform:uppercase;color:var(--ink-faint);margin:22px 0 10px}
 .agents{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:4px}
@@ -156,9 +156,24 @@ footer{padding:32px 40px;border-top:1px solid var(--border);display:flex;align-i
 .agent.plan .agent-num{color:#633806}
 .agent.portf{background:#E6F1FB;border-color:#85B7EB}
 .agent.portf .agent-num{color:#0C447C}
+/* ROADMAP */
+#roadmap{border-top:1px solid var(--border)}
+.rm-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;max-width:860px;margin:0 auto}
+.rm-phase-hd{display:flex;align-items:center;gap:10px;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--border)}
+.rm-badge{width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:13px;font-weight:700;flex-shrink:0}
+.rm-badge.now{background:var(--cell-d);border:1px solid #c2c0b8;box-shadow:inset 1px 1px 0 #b0aea6;color:var(--teal)}
+.rm-badge.next{background:var(--cell-d);border:1px solid #c2c0b8;box-shadow:inset 1px 1px 0 #b0aea6;color:#0C447C}
+.rm-badge.fut{background:var(--cell);box-shadow:inset -2px -2px 0 #b0aea6,inset 2px 2px 0 #f6f4ed;color:var(--ink-faint)}
+.rm-phase-title{font-family:var(--serif);font-size:14px;font-weight:600;color:var(--ink);line-height:1.2}
+.rm-phase-sub{font-family:var(--mono);font-size:8px;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink-faint);margin-top:3px}
+.rm-items{display:flex;flex-direction:column;gap:6px}
+.rm-item{font-family:var(--mono);font-size:10px;padding:6px 10px;letter-spacing:.2px;line-height:1.45}
+.rm-item.done{background:var(--teal-pale);border:1px solid var(--teal-light);color:var(--teal)}
+.rm-item.plan{background:var(--cell-d);border:1px solid #c2c0b8;box-shadow:inset 1px 1px 0 #b0aea6;color:var(--ink-muted)}
+.rm-item.hide{background:var(--cell);box-shadow:inset -2px -2px 0 #b0aea6,inset 2px 2px 0 #f6f4ed;color:var(--ink-faint)}
 @keyframes fadeUp{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
 @keyframes reveal{from{opacity:0;transform:scale(.88)}to{opacity:1;transform:scale(1)}}
- 
+
 @media(max-width:800px){
   nav{padding:0 20px}.nav-links{display:none}
   .wrap{padding:0 20px}section{padding:64px 0}
@@ -167,12 +182,13 @@ footer{padding:32px 40px;border-top:1px solid var(--border);display:flex;align-i
   .dg{grid-template-columns:1fr;gap:40px}
   .dcards{grid-template-columns:1fr 1fr}
   .agents{grid-template-columns:1fr}
+  .rm-grid{grid-template-columns:1fr}
   footer{padding:28px 20px}
 }
 </style>
 </head>
 <body>
- 
+
 <nav>
   <a href="#" class="nav-logo">
     <span class="g">◇◈</span>MINDSWEEPER
@@ -181,11 +197,12 @@ footer{padding:32px 40px;border-top:1px solid var(--border);display:flex;align-i
     <li><a href="#how">How it works</a></li>
     <li><a href="#video">Demo</a></li>
     <li><a href="#dashboard">Dashboard</a></li>
+    <li><a href="#roadmap">Roadmap</a></li>
     <li><a href="./Mindsweeper_Flow.html" target="_blank">Architecture</a></li>
   </ul>
   <a href="#dashboard" class="nav-btn">Begin assessment →</a>
 </nav>
- 
+
 <!-- HERO -->
 <section id="hero">
   <div id="hg"></div>
@@ -210,7 +227,7 @@ footer{padding:32px 40px;border-top:1px solid var(--border);display:flex;align-i
     <p class="tags">K–12<span>·</span>IB AA/AI<span>·</span>IGCSE<span>·</span>A Level<span>·</span>~10 minutes</p>
   </div>
 </section>
- 
+
 <!-- HOW IT WORKS -->
 <section id="how">
   <div class="wrap">
@@ -219,7 +236,7 @@ footer{padding:32px 40px;border-top:1px solid var(--border);display:flex;align-i
       <h2 class="st">Four phases.<br>One complete picture.</h2>
       <p class="ss">Mindsweeper doesn't test. It probes. The way a great teacher would, if they had an hour alone with one student and the patience to truly look.</p>
     </div>
- 
+
     <div class="phase">
       <div class="pn n1">1</div>
       <div>
@@ -231,7 +248,7 @@ footer{padding:32px 40px;border-top:1px solid var(--border);display:flex;align-i
         </div>
       </div>
     </div>
- 
+
     <div class="phase">
       <div class="pn n2">2</div>
       <div>
@@ -245,7 +262,7 @@ footer{padding:32px 40px;border-top:1px solid var(--border);display:flex;align-i
         </div>
         <div class="agt-intro">the seven agents</div>
         <div class="agents">
- 
+
           <div class="agent">
             <div class="agent-head">
               <div class="agent-num n1">1</div>
@@ -265,7 +282,7 @@ footer{padding:32px 40px;border-top:1px solid var(--border);display:flex;align-i
             </div>
             <div class="agent-cite">Learning Commons · SAP Coherence Map · ANet decomposition</div>
           </div>
- 
+
           <div class="agent">
             <div class="agent-head">
               <div class="agent-num n2">2</div>
@@ -284,7 +301,7 @@ footer{padding:32px 40px;border-top:1px solid var(--border);display:flex;align-i
               <div class="asec-txt">SDT classification from dialogue cues: shame/pride language → introjected. Parental/grade pressure → external. Future-goal language → identified. Curiosity, enjoyment, unprompted exploration → intrinsic. Amotivation flagged when engagement drops below threshold across 3 consecutive probes. Conscientiousness inferred from working completeness and self-monitoring frequency in the portfolio.</div>
             </div>
           </div>
- 
+
           <div class="agent">
             <div class="agent-head">
               <div class="agent-num n3">3</div>
@@ -303,7 +320,7 @@ footer{padding:32px 40px;border-top:1px solid var(--border);display:flex;align-i
               <div class="asec-txt">Cliff detection: performance drop &gt;40% when difficulty increases one grade band. Anxiety signal: answer revision rate &gt;30% on items the student got right first. Neuroticism inferred from revision frequency, self-deprecating language, and hesitation patterns.</div>
             </div>
           </div>
- 
+
           <div class="agent">
             <div class="agent-head">
               <div class="agent-num n4">4</div>
@@ -322,7 +339,7 @@ footer{padding:32px 40px;border-top:1px solid var(--border);display:flex;align-i
               <div class="asec-txt">Calibration gap = |predicted score − actual score| averaged across items. Gap &gt;25% is high-risk. Explanation scored on: uses own words, gives an example, identifies the key concept, spots where errors would occur. Zero on any of these flags a surface learner.</div>
             </div>
           </div>
- 
+
           <div class="agent portf">
             <div class="agent-head">
               <div class="agent-num">5</div>
@@ -341,7 +358,7 @@ footer{padding:32px 40px;border-top:1px solid var(--border);display:flex;align-i
               <div class="asec-txt">Output schema: {question_ref, steps[], final_answer, corrections[], layout_notes, ocr_confidence}. OCR confidence below 0.7 triggers a low-reliability flag; the Orchestrator down-weights that evidence accordingly.</div>
             </div>
           </div>
- 
+
           <div class="agent orch">
             <div class="agent-head">
               <div class="agent-num">6</div>
@@ -360,7 +377,7 @@ footer{padding:32px 40px;border-top:1px solid var(--border);display:flex;align-i
               <div class="asec-txt">OCEAN derived by synthesising all four assessors' logged behavioural primitives: openness (novelty-response), conscientiousness (working completeness), neuroticism (anxiety signals), agreeableness and extraversion (explanation style). No single assessor sees the full picture; the Orchestrator does.</div>
             </div>
           </div>
- 
+
           <div class="agent plan" style="grid-column:1/-1">
             <div class="agent-head">
               <div class="agent-num">7</div>
@@ -382,11 +399,11 @@ footer{padding:32px 40px;border-top:1px solid var(--border);display:flex;align-i
             </div>
             <div class="agent-cite">Learning Commons · LVN (Learning Variability Network) · ANet (Achievement Network) decomposition · Rosenshine (2012) · Yeager (2022)</div>
           </div>
- 
+
         </div>
       </div>
     </div>
- 
+
     <div class="phase">
       <div class="pn n3">3</div>
       <div>
@@ -404,7 +421,7 @@ footer{padding:32px 40px;border-top:1px solid var(--border);display:flex;align-i
         </div>
       </div>
     </div>
- 
+
     <div class="phase">
       <div class="pn n4">4</div>
       <div>
@@ -416,11 +433,11 @@ footer{padding:32px 40px;border-top:1px solid var(--border);display:flex;align-i
         </div>
       </div>
     </div>
- 
+
     <a href="./Mindsweeper_Flow.html" class="arch-lnk" target="_blank">View full technical architecture</a>
   </div>
 </section>
- 
+
 <!-- VIDEO -->
 <section id="video">
   <div class="wrap">
@@ -431,18 +448,20 @@ footer{padding:32px 40px;border-top:1px solid var(--border);display:flex;align-i
     </div>
     <div class="vwrap">
       <div class="vframe">
-        <!-- REPLACE with <iframe> or <video> when ready -->
-        <div class="vph">
-          <div class="vplay"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
-          <div class="vtag">Demo video · coming soon</div>
-          <div class="vtitle">Mindsweeper: live assessment walkthrough</div>
-        </div>
+        <video 
+          controls
+          preload="metadata"
+          poster=""
+          style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">
+          <source src="./Mindsweeper_demo_video.mp4" type="video/mp4">
+        </video>
+    
       </div>
       <p class="vtrail">Intake → Socratic probing → Portfolio analysis → Knowledge map → Character profile → Intervention plan</p>
     </div>
   </div>
 </section>
- 
+
 <!-- DASHBOARD -->
 <section id="dashboard">
   <div class="wrap">
@@ -459,7 +478,7 @@ footer{padding:32px 40px;border-top:1px solid var(--border);display:flex;align-i
         <a href="./Mindsweeper_Teacher_Console_1.html" class="bp" target="_blank">View demo dashboard →</a>
         <p style="font-family:var(--mono);font-size:9.5px;color:var(--ink-faint);margin-top:12px;letter-spacing:.5px">Demo · Yu Xiao Ting · Edexcel GCSE Foundation</p>
       </div>
- 
+
       <div class="dframe">
         <div class="dchrome">
           <span class="dot dr"></span><span class="dot dy"></span><span class="dot dg2"></span>
@@ -483,19 +502,88 @@ footer{padding:32px 40px;border-top:1px solid var(--border);display:flex;align-i
     </div>
   </div>
 </section>
- 
+
+
+<!-- ROADMAP -->
+<section id="roadmap">
+  <div class="wrap">
+    <div class="sh">
+      <div class="sl">What's next</div>
+      <h2 class="st">The roadmap.</h2>
+      <p class="ss">From working prototype to validated, persistent, multi-student platform.</p>
+    </div>
+    <div class="rm-grid">
+
+      <div class="rm-phase">
+        <div class="rm-phase-hd">
+          <div class="rm-badge now">✓</div>
+          <div>
+            <div class="rm-phase-title">Now · v0.4</div>
+            <div class="rm-phase-sub">7 agents · demo live</div>
+          </div>
+        </div>
+        <div class="rm-items">
+          <div class="rm-item done">Knowledge &amp; Skill assessment</div>
+          <div class="rm-item done">Mindset &amp; Motivation · SDT spectrum</div>
+          <div class="rm-item done">Resilience &amp; Affect</div>
+          <div class="rm-item done">Metacognition &amp; Communication</div>
+          <div class="rm-item done">Portfolio ingestion agent</div>
+          <div class="rm-item done">3-audience report · teacher console</div>
+          <div class="rm-item done">Intervention planner · LVN · ANet</div>
+        </div>
+      </div>
+
+      <div class="rm-phase">
+        <div class="rm-phase-hd">
+          <div class="rm-badge next">→</div>
+          <div>
+            <div class="rm-phase-title">Next · v1.0</div>
+            <div class="rm-phase-sub">Probe extensions · validation</div>
+          </div>
+        </div>
+        <div class="rm-items">
+          <div class="rm-item plan">Reverse AI chatbot probing</div>
+          <div class="rm-item plan">Halpern (1998) structural probes</div>
+          <div class="rm-item plan">Critical AI evaluation signals</div>
+          <div class="rm-item plan">Adaptive probe sequencing</div>
+          <div class="rm-item plan">Validation study · 50+ students</div>
+        </div>
+      </div>
+
+      <div class="rm-phase">
+        <div class="rm-phase-hd">
+          <div class="rm-badge fut">◇</div>
+          <div>
+            <div class="rm-phase-title">Future · v2.0</div>
+            <div class="rm-phase-sub">Infrastructure · persistent memory</div>
+          </div>
+        </div>
+        <div class="rm-items">
+          <div class="rm-item hide">External memory · MongoDB</div>
+          <div class="rm-item hide">Persistent student records</div>
+          <div class="rm-item hide">Multi-session trajectory</div>
+          <div class="rm-item hide">MCP server deployment</div>
+          <div class="rm-item hide">Multi-student cohort view</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
 <!-- FOOTER -->
 <footer>
   <a href="#" class="flogo"><span class="g">◇</span>MINDSWEEPER</a>
   <ul class="flinks">
     <li><a href="#how">How it works</a></li>
     <li><a href="#video">Demo</a></li>
+    <li><a href="#roadmap">Roadmap</a></li>
     <li><a href="./Mindsweeper_Flow.html" target="_blank">Architecture</a></li>
     <li><a href="https://github.com/huidadou/mindsweeper" target="_blank">GitHub</a></li>
   </ul>
   <p class="fcopy">mindsweeper.sg &nbsp;·&nbsp; v0.3 &nbsp;·&nbsp; 2026</p>
 </footer>
- 
+
 <script>
 (function(){
   var g=document.getElementById('hg'),U=38,nc=['n1','n2','n3','n4','n5','n6'];
