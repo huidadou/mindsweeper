@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -46,45 +46,6 @@ button, input, select, textarea { font-family: inherit; }
 .icon-btn:hover { background: var(--bg-content); border-color: var(--border); }
 .icon-btn .dot { position: absolute; top: 6px; right: 7px; width: 7px; height: 7px; background: var(--red); border-radius: 50%; border: 1.5px solid var(--surface); }
 .user-avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #ddd0a8, #b29960); color: white; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; cursor: pointer; }
-
-/* View switcher — selects audience perspective (teacher / parent / student) */
-.view-switcher { display: inline-flex; align-items: center; background: var(--bg-content); border: 1px solid var(--border); border-radius: 8px; padding: 3px; gap: 2px; }
-.view-switcher-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--ink-muted); padding: 0 8px 0 4px; font-weight: 600; }
-.view-switcher button { background: transparent; border: none; padding: 6px 12px; font-size: 12px; font-weight: 500; color: var(--ink-secondary); cursor: pointer; border-radius: 6px; font-family: 'Inter', sans-serif; transition: all 0.15s; }
-.view-switcher button:hover { color: var(--ink); }
-.view-switcher button.active { background: var(--surface); color: var(--ink); box-shadow: 0 1px 2px rgba(0,0,0,0.04); font-weight: 600; }
-
-/* View-mode banners — visible to non-teacher audiences to set expectations */
-.audience-banner { display: none; margin: 0 0 20px; padding: 14px 18px; border-radius: 10px; font-size: 13px; line-height: 1.55; }
-body[data-view="parent"] .audience-banner.audience-banner-parent { display: block; background: rgba(168,116,40,0.08); border: 1px solid rgba(168,116,40,0.22); color: #6a4810; }
-body[data-view="student"] .audience-banner.audience-banner-student { display: block; background: rgba(60,130,90,0.08); border: 1px solid rgba(60,130,90,0.22); color: #2d5a3f; }
-
-/* Sections/nav items hidden in a view */
-.section[data-views]:not([data-views~="teacher"]) { display: none; }
-body[data-view="parent"] .section[data-views]:not([data-views~="parent"]) { display: none; }
-body[data-view="student"] .section[data-views]:not([data-views~="student"]) { display: none; }
-body[data-view="teacher"] .section[data-views~="teacher"].active { display: block; }
-body[data-view="parent"] .section[data-views~="parent"].active { display: block; }
-body[data-view="student"] .section[data-views~="student"].active { display: block; }
-
-.nav-item[data-views]:not([data-views~="teacher"]) { display: none; }
-body[data-view="parent"] .nav-item[data-views]:not([data-views~="parent"]) { display: none; }
-body[data-view="student"] .nav-item[data-views]:not([data-views~="student"]) { display: none; }
-body[data-view="teacher"] .nav-item[data-views~="teacher"] { display: flex; }
-body[data-view="parent"] .nav-item[data-views~="parent"] { display: flex; }
-body[data-view="student"] .nav-item[data-views~="student"] { display: flex; }
-
-/* Hide individual elements within a section by view */
-[data-hide-in~="parent"]:not([data-hide-in=""]) { /* default visible */ }
-body[data-view="parent"] [data-hide-in~="parent"] { display: none !important; }
-body[data-view="student"] [data-hide-in~="student"] { display: none !important; }
-body[data-view="teacher"] [data-hide-in~="teacher"] { display: none !important; }
-
-/* Show alternative text per view */
-[data-show-in] { display: none; }
-body[data-view="teacher"] [data-show-in~="teacher"] { display: revert; }
-body[data-view="parent"] [data-show-in~="parent"] { display: revert; }
-body[data-view="student"] [data-show-in~="student"] { display: revert; }
 
 /* Sidebar */
 .app-body { display: grid; grid-template-columns: 260px 1fr; min-height: 0; }
@@ -395,7 +356,7 @@ details code { font-family: 'JetBrains Mono', monospace; font-size: 11px; backgr
 }
 </style>
 </head>
-<body data-view="teacher">
+<body>
 
 <div class="app">
 
@@ -406,23 +367,17 @@ details code { font-family: 'JetBrains Mono', monospace; font-size: 11px; backgr
     <span>Mindsweeper</span>
     <small>Teacher</small>
   </div>
-  <div class="student-picker" title="切换学生">
+  <div class="student-picker" title="Switch student">
     <div class="student-avatar">XT</div>
     <div class="student-picker-info">
-      <div class="student-picker-name">Yu Xiao Ting (虞潇婷)</div>
+      <div class="student-picker-name">Yu Xiao Ting</div>
       <div class="student-picker-meta">GCSE Foundation · Diagnostic v3 · 7 May 2026</div>
     </div>
     <span class="student-picker-chevron">▾</span>
   </div>
   <div class="topbar-actions">
-    <div class="view-switcher" role="tablist" aria-label="Audience view">
-      <span class="view-switcher-label">View</span>
-      <button data-view-btn="teacher" class="active" type="button">Teacher</button>
-      <button data-view-btn="parent" type="button">Parent</button>
-      <button data-view-btn="student" type="button">Student</button>
-    </div>
-    <input type="search" class="topbar-search" placeholder="搜索标准、题号、学生…">
-    <button class="icon-btn" title="通知">
+    <input type="search" class="topbar-search" placeholder="Search standards, items, students…">
+    <button class="icon-btn" title="Notifications">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
       <span class="dot"></span>
     </button>
@@ -435,168 +390,141 @@ details code { font-family: 'JetBrains Mono', monospace; font-size: 11px; backgr
 <!-- ===== Sidebar ===== -->
 <nav class="sidebar">
   <div class="nav-group">
-    <div class="nav-group-header">本学生</div>
-    <div class="nav-item active" data-target="dashboard" data-views="teacher parent student"><span class="nav-num">⌂</span><span class="nav-label">工作台</span><span class="nav-badge alert" data-hide-in="student">3</span></div>
-    <div class="nav-item" data-target="trajectory" data-views="teacher parent student"><span class="nav-num">↗</span><span class="nav-label">进度轨迹</span></div>
-    <div class="nav-item" data-target="intervention" data-views="teacher parent student"><span class="nav-num">▤</span><span class="nav-label"><span data-show-in="teacher parent">干预执行</span><span data-show-in="student">我的下一步</span></span><span class="nav-badge new" data-hide-in="student">P1</span></div>
+    <div class="nav-group-header">This student</div>
+    <div class="nav-item active" data-target="dashboard"><span class="nav-num">⌂</span><span class="nav-label">Dashboard</span><span class="nav-badge alert">3</span></div>
+    <div class="nav-item" data-target="trajectory"><span class="nav-num">↗</span><span class="nav-label">Progress trajectory</span></div>
+    <div class="nav-item" data-target="intervention"><span class="nav-num">▤</span><span class="nav-label">Intervention tracker</span><span class="nav-badge new">P1</span></div>
   </div>
-  <div class="nav-group" data-hide-in="student">
-    <div class="nav-group-header"><span data-show-in="teacher">诊断报告 v3</span><span data-show-in="parent">报告内容</span></div>
-    <div class="nav-item" data-target="cover" data-views="teacher parent"><span class="nav-num">—</span><span class="nav-label">封面信息</span></div>
-    <div class="nav-item" data-target="sec1" data-views="teacher parent"><span class="nav-num">①</span><span class="nav-label">当前表现</span></div>
-    <div class="nav-item" data-target="sec2" data-views="teacher"><span class="nav-num">②</span><span class="nav-label">表现 vs 知识</span></div>
-    <div class="nav-item" data-target="sec3" data-views="teacher parent"><span class="nav-num">③</span><span class="nav-label">巩固程度</span></div>
-    <div class="nav-item" data-target="sec4" data-views="teacher"><span class="nav-num">④</span><span class="nav-label">知识图谱</span></div>
-    <div class="nav-item" data-target="sec5" data-views="teacher"><span class="nav-num">⑤</span><span class="nav-label">瓶颈节点</span></div>
-    <div class="nav-item" data-target="sec6" data-views="teacher"><span class="nav-num">⑥</span><span class="nav-label">可干预因素</span></div>
-    <div class="nav-item" data-target="sec7" data-views="teacher parent"><span class="nav-num">⑦</span><span class="nav-label">特质与校准</span></div>
-    <div class="nav-item" data-target="sec8" data-views="teacher parent"><span class="nav-num">⑧</span><span class="nav-label">干预计划</span></div>
-    <div class="nav-item" data-target="sec9" data-views="teacher"><span class="nav-num">⑨</span><span class="nav-label">方法学</span></div>
+  <div class="nav-group">
+    <div class="nav-group-header">Diagnostic report v3</div>
+    <div class="nav-item" data-target="cover"><span class="nav-num">—</span><span class="nav-label">Cover</span></div>
+    <div class="nav-item" data-target="sec1"><span class="nav-num">①</span><span class="nav-label">Current performance</span></div>
+    <div class="nav-item" data-target="sec2"><span class="nav-num">②</span><span class="nav-label">Performance vs knowledge</span></div>
+    <div class="nav-item" data-target="sec3"><span class="nav-num">③</span><span class="nav-label">Consolidation gradient</span></div>
+    <div class="nav-item" data-target="sec4"><span class="nav-num">④</span><span class="nav-label">Knowledge tree</span></div>
+    <div class="nav-item" data-target="sec5"><span class="nav-num">⑤</span><span class="nav-label">Bottleneck analysis</span></div>
+    <div class="nav-item" data-target="sec6"><span class="nav-num">⑥</span><span class="nav-label">Intervenable factors</span></div>
+    <div class="nav-item" data-target="sec7"><span class="nav-num">⑦</span><span class="nav-label">Character &amp; calibration</span></div>
+    <div class="nav-item" data-target="sec8"><span class="nav-num">⑧</span><span class="nav-label">Intervention plan</span></div>
+    <div class="nav-item" data-target="sec9"><span class="nav-num">⑨</span><span class="nav-label">Methodology</span></div>
   </div>
-  <div class="nav-group" data-hide-in="parent student">
-    <div class="nav-group-header">工具</div>
-    <div class="nav-item" data-target="tool-newtest" data-views="teacher"><span class="nav-num">+</span><span class="nav-label">录入新测试</span></div>
-    <div class="nav-item" data-target="tool-verify" data-views="teacher"><span class="nav-num">⇄</span><span class="nav-label">标准校验</span></div>
-    <div class="nav-item" data-target="tool-parent" data-views="teacher"><span class="nav-num">⚇</span><span class="nav-label">家长版预览</span></div>
+  <div class="nav-group">
+    <div class="nav-group-header">Tools</div>
+    <div class="nav-item" data-target="tool-newtest"><span class="nav-num">+</span><span class="nav-label">Enter new test</span></div>
+    <div class="nav-item" data-target="tool-verify"><span class="nav-num">⇄</span><span class="nav-label">Standards verification</span></div>
+    <div class="nav-item" data-target="tool-parent"><span class="nav-num">⚇</span><span class="nav-label">Parent-facing preview</span></div>
   </div>
 </nav>
 
 <main class="content">
 
 <!-- ===== Dashboard ===== -->
-<section id="dashboard" class="section active" data-views="teacher parent student">
+<section id="dashboard" class="section active">
   <div class="section-header">
     <div class="section-title-block">
-      <div class="section-eyebrow">
-        <span data-show-in="teacher">学生工作台 · 周一 · 第 1 周</span>
-        <span data-show-in="parent">家长视角 · 第 1 周</span>
-        <span data-show-in="student">我的学习 · 第 1 周</span>
-      </div>
+      <div class="section-eyebrow">Student dashboard · Monday · Week 1</div>
       <h1>Yu Xiao Ting</h1>
-      <p class="section-subtitle">
-        <span data-show-in="teacher">8 周干预计划进行中 · 当前 Phase 1（修复瓶颈 + 巩固不稳定内容）· 距下次诊断检查点 12 天</span>
-        <span data-show-in="parent">孩子正在进行一个 8 周的学习计划。我们已经识别了主要的学习障碍,正在有针对性地修复。</span>
-        <span data-show-in="student">你的 8 周学习计划已经开始了 —— 接下来 12 天,重点是修一个关键的旧知识点,把基础打牢。</span>
-      </p>
+      <p class="section-subtitle">8-week intervention plan in progress · currently in Phase 1 (repair bottleneck + consolidate unstable content) · 12 days to next diagnostic checkpoint</p>
     </div>
-    <div class="section-actions" data-hide-in="parent student">
-      <button class="btn btn-secondary" onclick="showSection('tool-newtest')">+ 录入新测试</button>
-      <button class="btn btn-primary">导出本周计划</button>
+    <div class="section-actions">
+      <button class="btn btn-secondary" onclick="showSection('tool-newtest')">+ Enter new test</button>
+      <button class="btn btn-primary">Export this week's plan</button>
     </div>
   </div>
 
-  <div class="audience-banner audience-banner-parent">
-    <strong>家长视角说明:</strong> 这是为家长设计的简化视图。我们隐藏了纯学术性的诊断细节和方法学,保留了你最关心的信息 —— 孩子目前在哪里、计划怎么走、你可以怎么支持。如果想看完整教师版,请联系孩子的老师。
-  </div>
-  <div class="audience-banner audience-banner-student">
-    <strong>给你的视图:</strong> 你看到的是关于自己学习进度的总结。这不是考试成绩,是关于你**怎么学**的诊断 —— 重点是看到你已经做对了什么,以及接下来怎么进步。
-  </div>
-
-  <div class="verify-strip" data-hide-in="parent student">
+  <div class="verify-strip">
     <span class="green-dot"></span>
     <strong>Verified.</strong>
-    <span>所有 CCSS 标准已通过 Learning Commons MCP 实时校验 · 最近一次:5 月 20 日 14:32 · 知识进阶链用 SAP Coherence Map · 学习成分用 ANet 分解</span>
+    <span>All CCSS standards verified live via Learning Commons MCP · Last checked: 20 May 14:32 · Standards progression chain uses SAP Coherence Map · Learning components use ANet decomposition</span>
   </div>
 
   <div class="stat-grid">
     <div class="stat-card">
-      <div class="stat-label">最新综合分</div>
+      <div class="stat-label">Latest composite score</div>
       <div class="stat-value warning">56%</div>
-      <div class="stat-delta down">↓ 15pt vs Test 1（范围扩大）</div>
+      <div class="stat-delta down">↓ 15pt vs Test 1 (scope expanded)</div>
     </div>
     <div class="stat-card">
-      <div class="stat-label">需干预 Topic</div>
+      <div class="stat-label">Topics needing intervention</div>
       <div class="stat-value critical">4</div>
-      <div class="stat-delta">瓶颈 1 · Edexcel-only 2</div>
+      <div class="stat-delta">1 bottleneck · 2 Edexcel-only</div>
     </div>
     <div class="stat-card">
-      <div class="stat-label">本周策略</div>
+      <div class="stat-label">Strategies this week</div>
       <div class="stat-value">3</div>
       <div class="stat-delta">Worked Ex · Math Talks · Offload</div>
     </div>
     <div class="stat-card">
-      <div class="stat-label">下次检查点</div>
+      <div class="stat-label">Next checkpoint</div>
       <div class="stat-value">D-12</div>
-      <div class="stat-delta">Week 2 末 · 目标 ≥ 75%</div>
+      <div class="stat-delta">End of Week 2 · target ≥ 75%</div>
     </div>
   </div>
 
   <div class="focus-card">
-    <div class="focus-eyebrow">
-      <span data-show-in="teacher">PHASE 1 · 本周焦点</span>
-      <span data-show-in="parent">本周重点</span>
-      <span data-show-in="student">这周要做的</span>
-    </div>
-    <div class="focus-title">
-      <span data-show-in="teacher">修复瓶颈节点 7.EE.A.2</span>
-      <span data-show-in="parent">把"百分比转换"这个关键基础打牢</span>
-      <span data-show-in="student">把百分比和小数的转换搞清楚</span>
-    </div>
-    <div class="focus-desc">
-      <span data-show-in="teacher">7.EE.A.2（"+5% = ×1.05" 等价语法）是 Xiao Ting 整张知识图谱里的 root cause。它向下牵连 4 个高中标准（SAP fan-out 验证），其中 3 个对应她已经失分的题目。修复这一个概念门槛，会同时降低复利、反向百分比、二次不等式三类题型的认知负荷。</span>
-      <span data-show-in="parent">"+5% 等同于 ×1.05" 这个概念是 Xiao Ting 目前知识体系中的关键缺口。它会同时影响她后续在复利计算、百分比反算、二次不等式等多个题型上的表现。这一周专门修这个,后续 3-4 类题型的难度都会同时降低。</span>
-      <span data-show-in="student">现在卡你的不是题目本身,是"加 5%"和"乘以 1.05"是一回事这个连接没建立。把这个搞清楚之后,后面的复利题、百分比题、不等式题都会容易很多。一个点撬动一片。</span>
-    </div>
+    <div class="focus-eyebrow">PHASE 1 · This week's focus</div>
+    <div class="focus-title">Repair bottleneck node 7.EE.A.2</div>
+    <div class="focus-desc">7.EE.A.2 (the "+5% = ×1.05" equivalence) is the root cause across Xiao Ting's entire knowledge graph. It propagates downward to 4 high-school standards (SAP fan-out verified), three of which correspond to items she has already lost marks on. Repairing this single conceptual gate will simultaneously reduce cognitive load across three downstream item families: compound interest, reverse percentage, and quadratic inequalities.</div>
     <div class="focus-strats">
-      <span class="focus-strat-chip"><span data-show-in="teacher parent">Worked Examples（含错误样例分析）</span><span data-show-in="student">看带错误的样例</span></span>
-      <span class="focus-strat-chip"><span data-show-in="teacher parent">Math Talks（口头推理）</span><span data-show-in="student">把思路说出来</span></span>
-      <span class="focus-strat-chip"><span data-show-in="teacher parent">Cognitive Offloading（外置工作记忆）</span><span data-show-in="student">写步骤,别全靠脑子记</span></span>
+      <span class="focus-strat-chip">Worked Examples (with error-example analysis)</span>
+      <span class="focus-strat-chip">Math Talks (verbal reasoning)</span>
+      <span class="focus-strat-chip">Cognitive Offloading (external working memory)</span>
     </div>
   </div>
 
   <div class="panel-grid">
     <div class="panel">
       <div class="panel-header">
-        <div class="panel-title">需要关注的事项</div>
-        <span class="panel-link" onclick="showSection('intervention')">查看全部 →</span>
+        <div class="panel-title">Items requiring attention</div>
+        <span class="panel-link" onclick="showSection('intervention')">View all →</span>
       </div>
       <ul class="activity-list">
         <li class="activity-item">
           <span class="activity-date">D-12</span>
-          <span class="activity-desc"><strong>Week 2 诊断检查点</strong>：8 道混合题，4 percent / 2 复利 / 2 二次不等式，目标 ≥ 75% 步骤完整</span>
+          <span class="activity-desc"><strong>Week 2 diagnostic checkpoint</strong>: 8 mixed items — 4 percent / 2 compound interest / 2 quadratic inequalities; target ≥ 75% with full working shown</span>
           <span class="activity-tag">SCHED</span>
         </li>
         <li class="activity-item">
-          <span class="activity-date">本周</span>
-          <span class="activity-desc"><strong>错误样例卡组 (6 张)</strong> 需要准备好 — 卡 #2（a − 0.15a = 0.85a）是核心</span>
+          <span class="activity-date">This week</span>
+          <span class="activity-desc"><strong>Error-example deck (6 cards)</strong> must be ready — Card #2 (a − 0.15a = 0.85a) is the core item</span>
           <span class="activity-tag">TODO</span>
         </li>
         <li class="activity-item">
-          <span class="activity-date">本周</span>
-          <span class="activity-desc"><strong>Bearings + 概率词汇双语卡</strong>（Phase 2 预备）— 5 min/day</span>
+          <span class="activity-date">This week</span>
+          <span class="activity-desc"><strong>Bearings + probability bilingual vocabulary cards</strong> (Phase 2 prep) — 5 min/day</span>
           <span class="activity-tag">PREP</span>
         </li>
       </ul>
     </div>
     <div class="panel">
       <div class="panel-header">
-        <div class="panel-title">最近活动</div>
-        <span class="panel-link">完整日志 →</span>
+        <div class="panel-title">Recent activity</div>
+        <span class="panel-link">Full log →</span>
       </div>
       <ul class="activity-list">
         <li class="activity-item">
           <span class="activity-date">7 MAY</span>
-          <span class="activity-desc">诊断报告 v3 生成 · 瓶颈从 8.EE.A.1 修订为 7.EE.A.2（API 验证）</span>
+          <span class="activity-desc">Diagnostic report v3 generated · bottleneck revised from 8.EE.A.1 to 7.EE.A.2 (API-verified)</span>
           <span class="activity-tag">REPORT</span>
         </li>
         <li class="activity-item">
           <span class="activity-date">1 APR</span>
-          <span class="activity-desc">Test 2 录入：14/25（56%）· 范围扩大到 GCSE Foundation 全量</span>
+          <span class="activity-desc">Test 2 entered: 14/25 (56%) · scope expanded to full GCSE Foundation</span>
           <span class="activity-tag">TEST</span>
         </li>
         <li class="activity-item">
           <span class="activity-date">25 MAR</span>
-          <span class="activity-desc">Test 1 录入：32/45（71%）</span>
+          <span class="activity-desc">Test 1 entered: 32/45 (71%)</span>
           <span class="activity-tag">TEST</span>
         </li>
         <li class="activity-item">
           <span class="activity-date">19 MAR</span>
-          <span class="activity-desc">Peer teaching 观察：在教同学时显著激活</span>
+          <span class="activity-desc">Peer teaching observation: notably engaged when teaching a classmate</span>
           <span class="activity-tag">OBS</span>
         </li>
         <li class="activity-item">
           <span class="activity-date">12 MAR</span>
-          <span class="activity-desc">初次诊断：32% · 工作记忆超载、考试焦虑为主信号</span>
+          <span class="activity-desc">Initial diagnostic: 32% · working memory overload and test anxiety as primary signals</span>
           <span class="activity-tag">INIT</span>
         </li>
       </ul>
@@ -605,65 +533,65 @@ details code { font-family: 'JetBrains Mono', monospace; font-size: 11px; backgr
 </section>
 
 <!-- ===== Trajectory ===== -->
-<section id="trajectory" class="section" data-views="teacher parent student">
+<section id="trajectory" class="section">
   <div class="section-header">
     <div class="section-title-block">
       <div class="section-eyebrow">LONGITUDINAL · TRAJECTORY</div>
-      <h1>进度轨迹</h1>
-      <p class="section-subtitle">从 3 月 11 日基线（32%）到现在，叠加干预节点与诊断检查点。这是 Mindsweeper 持续追踪模型的核心视图。</p>
+      <h1>Progress trajectory</h1>
+      <p class="section-subtitle">From the 11 March baseline (32%) to the present, with intervention milestones and diagnostic checkpoints overlaid. This is the central view of Mindsweeper's longitudinal tracking model.</p>
     </div>
     <div class="section-actions">
-      <button class="btn btn-ghost">导出 PNG</button>
-      <button class="btn btn-secondary">叠加比较学生</button>
+      <button class="btn btn-ghost">Export PNG</button>
+      <button class="btn btn-secondary">Overlay comparison cohort</button>
     </div>
   </div>
   <div class="traj-wrap">
     <div class="traj-canvas-wrap"><canvas id="traj-chart"></canvas></div>
     <div class="traj-events">
-      <div class="traj-event"><span class="date">11 MAR</span><span class="label">初次诊断 · 32%</span>基线测试，发现工作记忆超载与考试焦虑两大信号</div>
-      <div class="traj-event"><span class="date">25 MAR</span><span class="label">Test 1 · 71%</span>2 周针对性训练后，进步显著</div>
-      <div class="traj-event"><span class="date">1 APR</span><span class="label">Test 2 · 56%</span>范围扩大到 GCSE Foundation 全量，下降反映 scope 而非 regression</div>
-      <div class="traj-event"><span class="date">7 MAY</span><span class="label">诊断报告 v3</span>瓶颈节点 7.EE.A.2 确认，8 周计划启动</div>
+      <div class="traj-event"><span class="date">11 MAR</span><span class="label">Initial diagnostic · 32%</span>Baseline test; identified working memory overload and test anxiety as the two principal signals</div>
+      <div class="traj-event"><span class="date">25 MAR</span><span class="label">Test 1 · 71%</span>Marked improvement after two weeks of targeted training</div>
+      <div class="traj-event"><span class="date">1 APR</span><span class="label">Test 2 · 56%</span>Scope expanded to the full GCSE Foundation set; the decline reflects expanded scope, not regression</div>
+      <div class="traj-event"><span class="date">7 MAY</span><span class="label">Diagnostic report v3</span>Bottleneck node 7.EE.A.2 confirmed; the 8-week plan begins</div>
     </div>
   </div>
 </section>
 
 <!-- ===== Intervention tracker ===== -->
-<section id="intervention" class="section" data-views="teacher parent student">
+<section id="intervention" class="section">
   <div class="section-header">
     <div class="section-title-block">
       <div class="section-eyebrow">EXECUTION · 8 WEEKS</div>
-      <h1>干预执行追踪</h1>
-      <p class="section-subtitle">基于 §⑧ 计划的执行视图。勾选已完成的策略，进度自动汇总到工作台。</p>
+      <h1>Intervention execution tracker</h1>
+      <p class="section-subtitle">Execution view derived from the §⑧ plan. Tick off completed strategies; progress is automatically aggregated to the dashboard.</p>
     </div>
     <div class="section-actions">
-      <button class="btn btn-ghost">导出执行日志</button>
-      <button class="btn btn-secondary">编辑计划</button>
+      <button class="btn btn-ghost">Export execution log</button>
+      <button class="btn btn-secondary">Edit plan</button>
     </div>
   </div>
   <div class="phase-tabs" id="phase-tabs">
-    <button class="phase-tab active" data-phase="p1"><span class="num">PHASE 1 · WK 1-2</span><span class="name">修复瓶颈</span><span class="week">in progress</span></button>
-    <button class="phase-tab" data-phase="p2"><span class="num">PHASE 2 · WK 3-4</span><span class="name">概念脚手架</span><span class="week">upcoming</span></button>
-    <button class="phase-tab" data-phase="p3"><span class="num">PHASE 3 · WK 5-6</span><span class="name">元认知校准</span><span class="week">parallel</span></button>
-    <button class="phase-tab" data-phase="p4"><span class="num">PHASE 4 · WK 7-8</span><span class="name">整合 + CEM</span><span class="week">upcoming</span></button>
+    <button class="phase-tab active" data-phase="p1"><span class="num">PHASE 1 · WK 1-2</span><span class="name">Repair bottleneck</span><span class="week">in progress</span></button>
+    <button class="phase-tab" data-phase="p2"><span class="num">PHASE 2 · WK 3-4</span><span class="name">Conceptual scaffolding</span><span class="week">upcoming</span></button>
+    <button class="phase-tab" data-phase="p3"><span class="num">PHASE 3 · WK 5-6</span><span class="name">Metacognitive calibration</span><span class="week">parallel</span></button>
+    <button class="phase-tab" data-phase="p4"><span class="num">PHASE 4 · WK 7-8</span><span class="name">Integration + CEM</span><span class="week">upcoming</span></button>
   </div>
 
   <div id="phase-panel-p1" class="phase-panel active">
     <div class="phase-hero">
-      <h2>Phase 1 · 修复瓶颈 + 巩固不稳定内容</h2>
-      <p style="font-size: 13px; color: var(--ink-secondary); line-height: 1.7;">焦点：7.EE.A.2（multiplier-rate 等价）+ 反向百分比、复利、二次不等式。修复这个概念门槛会同时降低三类下游题目的认知负荷。</p>
+      <h2>Phase 1 · Repair bottleneck + consolidate unstable content</h2>
+      <p style="font-size: 13px; color: var(--ink-secondary); line-height: 1.7;">Focus: 7.EE.A.2 (multiplier-rate equivalence) plus reverse percentage, compound interest, and quadratic inequalities. Repairing this conceptual gate simultaneously reduces cognitive load across the three downstream item families.</p>
       <div class="phase-progress-bar"><div class="phase-progress-fill" id="p1-progress" style="width: 22%"></div></div>
-      <div class="phase-progress-label"><span id="p1-progress-label">2/9 策略已执行</span><span>Week 1 · Day 3</span></div>
+      <div class="phase-progress-label"><span id="p1-progress-label">2/9 strategies executed</span><span>Week 1 · Day 3</span></div>
     </div>
     <div class="strategy">
       <div class="strat-head">
         <div class="strat-check done" data-strat="p1s1"></div>
         <div class="strat-info">
           <div class="strat-name"><span class="strat-tag">LVN</span>Worked Examples</div>
-          <div class="strat-targets">目标：Working Memory · Long-term Memory</div>
-          <div class="strat-desc">先给完整步骤的样例，再让学生独立做。LVN Math 7-10 指出，<strong>错误样例分析</strong>对概念发展尤其有效——给她一个错误的样例（用 0.15 代替 0.85），让她找出并解释错在哪里。</div>
-          <div class="strat-action"><strong>具体动作：</strong> 6 张迷你卡组。卡 1：a + 0.05a = 1.05a（7.EE.A.2 标准样例）。卡 2：a − 0.15a = 0.85a（衰减变体）。卡 3：18000 × 0.85³（PT1-Q22b 正确版）。卡 4-6 引入变体。逐步弱化引导：完整解 → 中间步骤留空 → 末步留空 → 独立完成。</div>
-          <div class="strat-research">研究依据：Sweller (1988) cognitive load theory; Renkl (2014) worked example effect</div>
+          <div class="strat-targets">Targets: Working Memory · Long-term Memory</div>
+          <div class="strat-desc">Present fully worked examples first, then have the student attempt independently. LVN Math 7-10 indicates that <strong>error-example analysis</strong> is especially effective for conceptual development — present a flawed example (using 0.15 instead of 0.85) and have her identify and articulate where it went wrong.</div>
+          <div class="strat-action"><strong>Concrete actions:</strong> A 6-card mini-deck. Card 1: a + 0.05a = 1.05a (canonical 7.EE.A.2 example). Card 2: a − 0.15a = 0.85a (decay variant). Card 3: 18000 × 0.85³ (correct version of PT1-Q22b). Cards 4-6 introduce further variants. Gradually fade scaffolding: full solution → middle steps blank → final step blank → independent completion.</div>
+          <div class="strat-research">Research basis: Sweller (1988) cognitive load theory; Renkl (2014) worked example effect</div>
         </div>
       </div>
     </div>
@@ -672,10 +600,10 @@ details code { font-family: 'JetBrains Mono', monospace; font-size: 11px; backgr
         <div class="strat-check done" data-strat="p1s2"></div>
         <div class="strat-info">
           <div class="strat-name"><span class="strat-tag">LVN</span>Math Talks</div>
-          <div class="strat-targets">目标：Math Communication · Long-term Memory · Self-efficacy</div>
-          <div class="strat-desc">让学生口头解释数学推理。LVN Math Talks 指出，出声解释比纯练习更可靠地强化长期记忆。</div>
-          <div class="strat-action"><strong>具体动作：</strong> 每次 15 分钟。示例提示："为什么 15% 减少的 multiplier 是 0.85 而不是 0.15？像给比你小的学生解释一样讲给我听。"如果她卡住，<strong>不要打断</strong>——等她自我修正，那个挣扎过程就是学习发生的地方。</div>
-          <div class="strat-research">研究依据：Chi & Wylie (2014) ICAP framework; Schoenfeld (1992)</div>
+          <div class="strat-targets">Targets: Math Communication · Long-term Memory · Self-efficacy</div>
+          <div class="strat-desc">Have the student verbalise her mathematical reasoning. LVN Math Talks notes that articulating reasoning aloud consolidates long-term memory more reliably than silent practice.</div>
+          <div class="strat-action"><strong>Concrete actions:</strong> 15 minutes per session. Sample prompt: "Why is the multiplier for a 15% decrease 0.85 rather than 0.15? Explain it to me as if you were teaching a younger student." If she gets stuck, <strong>do not interrupt</strong> — wait for her to self-correct; that struggle is where learning happens.</div>
+          <div class="strat-research">Research basis: Chi &amp; Wylie (2014) ICAP framework; Schoenfeld (1992)</div>
         </div>
       </div>
     </div>
@@ -684,160 +612,160 @@ details code { font-family: 'JetBrains Mono', monospace; font-size: 11px; backgr
         <div class="strat-check" data-strat="p1s3"></div>
         <div class="strat-info">
           <div class="strat-name"><span class="strat-tag">LVN</span>Cognitive Offloading</div>
-          <div class="strat-targets">目标：Working Memory</div>
-          <div class="strat-desc">明确教她把纸作为外置工作记忆。Tully et al. (2025) 显示，纸面卸载对已有先备知识的学生（正是 Xiao Ting 的画像）效益最大。</div>
-          <div class="strat-action"><strong>具体动作：</strong> 任何多步题的三步规则：(1) 写下已知；(2) 写下需求；(3) 计算前先写出方法选择。两周内每个多步题都用这个规则。目标是把外置卸载在时间压力激活前就自动化。</div>
-          <div class="strat-research">研究依据：Risko & Gilbert (2016); Tully et al. (2025) Br J Educ Psychol</div>
+          <div class="strat-targets">Target: Working Memory</div>
+          <div class="strat-desc">Explicitly teach her to use paper as external working memory. Tully et al. (2025) show that paper-based offloading yields the greatest benefit for students with prior knowledge in place — precisely Xiao Ting's profile.</div>
+          <div class="strat-action"><strong>Concrete actions:</strong> A three-step rule for every multi-step problem: (1) write the givens; (2) write the requirement; (3) state the method choice before computing. Apply this rule to every multi-step problem for two weeks. The goal is to automate external offloading before time pressure activates.</div>
+          <div class="strat-research">Research basis: Risko &amp; Gilbert (2016); Tully et al. (2025) Br J Educ Psychol</div>
         </div>
       </div>
     </div>
     <div class="checkpoint">
-      <strong>诊断检查点（Week 2 末）：</strong> 8 道混合题——4 percentage change、2 复利、2 二次不等式。目标 ≥ 75%，限时条件，所有步骤可见。
+      <strong>Diagnostic checkpoint (end of Week 2):</strong> 8 mixed items — 4 percentage change, 2 compound interest, 2 quadratic inequalities. Target ≥ 75%, timed conditions, all working shown.
     </div>
   </div>
 
   <div id="phase-panel-p2" class="phase-panel">
     <div class="empty-state">
-      <div class="empty-state-title">Phase 2 还未开始</div>
-      <div class="empty-state-desc">将在 Week 3 解锁 · 焦点：bearings、similar solids、quadratic formula、independent events with complement</div>
-      <button class="btn btn-secondary">预览策略清单</button>
+      <div class="empty-state-title">Phase 2 has not yet started</div>
+      <div class="empty-state-desc">Unlocks at Week 3 · Focus: bearings, similar solids, quadratic formula, independent events with complement</div>
+      <button class="btn btn-secondary">Preview strategy list</button>
     </div>
   </div>
   <div id="phase-panel-p3" class="phase-panel">
     <div class="empty-state">
-      <div class="empty-state-title">Phase 3 并行于 Phase 1-2</div>
-      <div class="empty-state-desc">元认知校准训练 · 焦点：把 §⑦ 的预测偏差变成可测量的技能</div>
+      <div class="empty-state-title">Phase 3 runs in parallel with Phases 1-2</div>
+      <div class="empty-state-desc">Metacognitive calibration training · Focus: turn the predictive bias documented in §⑦ into a measurable skill</div>
     </div>
   </div>
   <div id="phase-panel-p4" class="phase-panel">
     <div class="empty-state">
-      <div class="empty-state-title">Phase 4 整合期</div>
-      <div class="empty-state-desc">Week 7-8 · CEM 全长模拟 + 纵向证据呈现</div>
+      <div class="empty-state-title">Phase 4 — integration period</div>
+      <div class="empty-state-desc">Weeks 7-8 · Full-length CEM simulations + longitudinal evidence presentation</div>
     </div>
   </div>
 </section>
 
 <!-- ===== Cover ===== -->
-<section id="cover" class="section" data-views="teacher parent">
+<section id="cover" class="section">
   <div class="section-header">
     <div class="section-title-block">
       <div class="section-eyebrow">REPORT v3 · COVER</div>
-      <h1>诊断报告封面信息</h1>
-      <p class="section-subtitle">学生基本信息、测试历史、报告生成元数据</p>
+      <h1>Diagnostic report cover</h1>
+      <p class="section-subtitle">Student profile, testing history, and report generation metadata</p>
     </div>
   </div>
   <div class="verify-strip">
     <span class="green-dot"></span><strong>API-verified.</strong>
-    <span>每条 CCSS 代码通过 Learning Commons 三步流程验证。v1 曾误判 8.EE.A.1 为瓶颈，经 API 修正为 7.EE.A.2。</span>
+    <span>Every CCSS code has been verified through the three-step Learning Commons workflow. v1 initially misidentified 8.EE.A.1 as the bottleneck; the API corrected this to 7.EE.A.2.</span>
   </div>
   <div class="panel">
-    <div class="panel-header"><div class="panel-title">学生概况</div><span class="panel-link">由 Paula Zheng 维护</span></div>
+    <div class="panel-header"><div class="panel-title">Student profile</div><span class="panel-link">Maintained by Paula Zheng</span></div>
     <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; font-size: 13px;">
-      <div><div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--ink-muted); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px;">姓名</div><div style="font-family: 'Source Serif 4', serif; font-size: 16px; font-weight: 600;">虞潇婷 / Yu Xiao Ting</div></div>
-      <div><div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--ink-muted); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px;">课程</div><div style="font-family: 'Source Serif 4', serif; font-size: 16px; font-weight: 600;">Edexcel GCSE 9-1 Foundation</div></div>
-      <div><div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--ink-muted); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px;">目标</div><div style="font-family: 'Source Serif 4', serif; font-size: 16px; font-weight: 600;">Perse Year 9 · CEM</div></div>
-      <div><div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--ink-muted); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px;">诊断历史</div><div style="font-size: 13px;">PT1 (25 Mar) 71% → PT2 (1 Apr) 56%</div></div>
-      <div><div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--ink-muted); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px;">本报告生成</div><div style="font-size: 13px;">7 May 2026 · v3 (EN)</div></div>
-      <div><div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--ink-muted); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px;">下次检查点</div><div style="font-size: 13px;">Week 2 末 · 8 题混合诊断</div></div>
+      <div><div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--ink-muted); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px;">Name</div><div style="font-family: 'Source Serif 4', serif; font-size: 16px; font-weight: 600;">Yu Xiao Ting</div></div>
+      <div><div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--ink-muted); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px;">Course</div><div style="font-family: 'Source Serif 4', serif; font-size: 16px; font-weight: 600;">Edexcel GCSE 9-1 Foundation</div></div>
+      <div><div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--ink-muted); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px;">Target</div><div style="font-family: 'Source Serif 4', serif; font-size: 16px; font-weight: 600;">Perse Year 9 · CEM</div></div>
+      <div><div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--ink-muted); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px;">Diagnostic history</div><div style="font-size: 13px;">PT1 (25 Mar) 71% → PT2 (1 Apr) 56%</div></div>
+      <div><div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--ink-muted); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px;">Report generated</div><div style="font-size: 13px;">7 May 2026 · v3 (EN)</div></div>
+      <div><div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--ink-muted); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px;">Next checkpoint</div><div style="font-size: 13px;">End of Week 2 · 8-item mixed diagnostic</div></div>
     </div>
   </div>
   <div style="margin-top: 18px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;">
-    <div class="stat-card"><div class="stat-label">需干预 Topic</div><div class="stat-value critical">4</div></div>
-    <div class="stat-card"><div class="stat-label">需关注 Topic</div><div class="stat-value warning">4</div></div>
-    <div class="stat-card"><div class="stat-label">已巩固 Topic</div><div class="stat-value ok">4</div></div>
+    <div class="stat-card"><div class="stat-label">Topics needing intervention</div><div class="stat-value critical">4</div></div>
+    <div class="stat-card"><div class="stat-label">Topics to watch</div><div class="stat-value warning">4</div></div>
+    <div class="stat-card"><div class="stat-label">Topics consolidated</div><div class="stat-value ok">4</div></div>
   </div>
 </section>
 
 <!-- ===== Sec 1: Topic scores ===== -->
-<section id="sec1" class="section" data-views="teacher parent">
+<section id="sec1" class="section">
   <div class="section-header">
     <div class="section-title-block">
       <div class="section-eyebrow">§① CURRENT PERFORMANCE</div>
       <h1>Topic-level scores</h1>
-      <p class="section-subtitle">两次测试汇总。Topic 命名沿 Edexcel GCSE 9-1 Foundation 习惯；标准代码 CCSS-M（已通过 Learning Commons 校验）。Bearings 和 similar solids 是 Edexcel-only，无干净 CCSS 锚点，已标注。</p>
+      <p class="section-subtitle">Aggregated across both tests. Topic names follow Edexcel GCSE 9-1 Foundation conventions; standard codes are CCSS-M (verified via Learning Commons). Bearings and similar solids are Edexcel-only with no clean CCSS anchor, and are flagged accordingly.</p>
     </div>
   </div>
   <div class="data-table">
     <div class="table-toolbar">
-      <span class="filter-chip active" data-filter="all">全部 12</span>
-      <span class="filter-chip" data-filter="critical">需干预 4</span>
-      <span class="filter-chip" data-filter="warning">需关注 4</span>
-      <span class="filter-chip" data-filter="ok">已巩固 4</span>
+      <span class="filter-chip active" data-filter="all">All 12</span>
+      <span class="filter-chip" data-filter="critical">Intervene 4</span>
+      <span class="filter-chip" data-filter="warning">Watch 4</span>
+      <span class="filter-chip" data-filter="ok">Consolidated 4</span>
       <span class="filter-spacer"></span>
-      <span class="filter-count">点击任意行展开证据</span>
+      <span class="filter-count">Click any row to expand evidence</span>
     </div>
     <div id="topic-rows"></div>
   </div>
 </section>
 
 <!-- ===== Sec 2: Performance vs Knowledge ===== -->
-<section id="sec2" class="section" data-views="teacher">
+<section id="sec2" class="section">
   <div class="section-header">
     <div class="section-title-block">
       <div class="section-eyebrow">§② PERFORMANCE vs KNOWLEDGE GAP</div>
-      <h1>不是每个失分都是知识缺口</h1>
-      <p class="section-subtitle">常规诊断把每个错题都当作知识缺口。跨测试分析显示，Xiao Ting 失分中有相当一部分来自<strong>执行失败而非概念缺口</strong>。把这两类分开能避免干预计划重复教授她已经掌握的内容。</p>
+      <h1>Not every lost mark is a knowledge gap</h1>
+      <p class="section-subtitle">Conventional diagnostics treat every wrong answer as a knowledge gap. Cross-test analysis shows that a substantial portion of Xiao Ting's lost marks stem from <strong>execution failure rather than conceptual gaps</strong>. Separating the two prevents the intervention plan from re-teaching material she has already mastered.</p>
     </div>
   </div>
   <div class="gap-table-wrap">
     <div class="gap-summary">
       <div><div class="gap-bignum">~7</div><div class="gap-bignum-label">marks</div></div>
-      <div class="gap-summary-text">在两次测试共 70 分里，<strong>约 7 分（~10%）是在概念完整的情况下因执行失败丢的</strong>。仅纠正这一类就能把 PT1 提到 ~80%、PT2 提到 ~75%——更接近她真实的天花板。</div>
+      <div class="gap-summary-text">Of the 70 marks across both tests, <strong>roughly 7 (~10%) were lost to execution failure despite intact conceptual understanding</strong>. Correcting this category alone would lift PT1 to ~80% and PT2 to ~75% — closer to her actual ceiling.</div>
     </div>
     <table class="gap-table">
-      <thead><tr><th style="width: 12%">题号</th><th style="width: 16%">类别</th><th style="width: 30%">出了什么问题</th><th>概念完整的证据</th></tr></thead>
+      <thead><tr><th style="width: 12%">Item</th><th style="width: 16%">Category</th><th style="width: 30%">What went wrong</th><th>Evidence of intact concept</th></tr></thead>
       <tbody>
-        <tr><td class="qid">PT1-Q11</td><td><span class="gap-cat arith">Arithmetic</span></td><td>反向百分比方法正确，链式乘法（×1.025 × 1.032）算错</td><td>方法步骤可见。无计算器下多步导致工作记忆超载</td></tr>
-        <tr><td class="qid">PT1-Q18b</td><td><span class="gap-cat arith">读图精度</span></td><td>读 x-intercepts 为 -0.7 和 4.8（真值 ≈ -0.65, 4.65）；写下多个值后涂改</td><td>(0,-3) 和顶点 (2,-7) 均正确——读图概念在，精度不够</td></tr>
-        <tr><td class="qid">PT1-Q21a</td><td><span class="gap-cat work">未写过程</span></td><td>因式分解步骤不可读（丢 2 分），但 (b) 给出 x = 5 或 -2</td><td>(b) 完全正确——知道但没写</td></tr>
-        <tr><td class="qid">PT1-Q22b</td><td><span class="gap-cat arith">Arithmetic</span></td><td>写出复利正确公式 18000 × 0.85³，算成 9900（应 ≈11054）</td><td>方法链正确——复利公式应用对了</td></tr>
-        <tr><td class="qid">PT2-Q1</td><td><span class="gap-cat dual">双选</span></td><td>圈了 A（x>5，对）和 C（x<5）；最终答案 C</td><td>第一个圈对了——不确定下推翻自己</td></tr>
-        <tr><td class="qid">PT2-Q10</td><td><span class="gap-cat dual">双选</span></td><td>圈了 B（9，对）和 D（5）；最终 D</td><td>她知道答案——二次猜测导致最终错</td></tr>
-        <tr><td class="qid">PT2-Q15</td><td><span class="gap-cat notation">记号读反</span></td><td>"y:x" 读成 "x:y"，选了 3:8 而非 8:3</td><td>代数变换 3y=8x 正确——只是比例顺序反了</td></tr>
-        <tr><td class="qid">PT2-Q22c</td><td><span class="gap-cat arith">连锁错误</span></td><td>方法正确（体积 × 单价）；体积输入来自 (b) 的错误结果</td><td>"体积 × 单价 = 总成本" 模型本身正确</td></tr>
+        <tr><td class="qid">PT1-Q11</td><td><span class="gap-cat arith">Arithmetic</span></td><td>Reverse-percentage method correct; chained multiplication (×1.025 × 1.032) miscalculated</td><td>Method steps visible. Multi-step computation without a calculator induced working memory overload</td></tr>
+        <tr><td class="qid">PT1-Q18b</td><td><span class="gap-cat arith">Graph-reading precision</span></td><td>Read x-intercepts as −0.7 and 4.8 (true values ≈ −0.65, 4.65); wrote several values and crossed them out</td><td>(0, −3) and vertex (2, −7) both correct — the graph-reading concept is present; precision is insufficient</td></tr>
+        <tr><td class="qid">PT1-Q21a</td><td><span class="gap-cat work">Working not shown</span></td><td>Factoring steps illegible (2 marks lost), but (b) gave x = 5 or −2</td><td>(b) fully correct — she knew it but did not record the working</td></tr>
+        <tr><td class="qid">PT1-Q22b</td><td><span class="gap-cat arith">Arithmetic</span></td><td>Wrote the correct compound-interest formula 18000 × 0.85³, but computed it as 9900 (should be ≈ 11054)</td><td>Method chain correct — compound-interest formula applied correctly</td></tr>
+        <tr><td class="qid">PT2-Q1</td><td><span class="gap-cat dual">Second-guessing</span></td><td>Circled A (x &gt; 5, correct) and C (x &lt; 5); final answer C</td><td>First circle was correct — she overturned her own answer under uncertainty</td></tr>
+        <tr><td class="qid">PT2-Q10</td><td><span class="gap-cat dual">Second-guessing</span></td><td>Circled B (9, correct) and D (5); final answer D</td><td>She knew the answer — second-guessing led to the wrong final choice</td></tr>
+        <tr><td class="qid">PT2-Q15</td><td><span class="gap-cat notation">Notation misread</span></td><td>Read "y:x" as "x:y" and selected 3:8 instead of 8:3</td><td>Algebraic manipulation 3y = 8x correct — only the ratio order was reversed</td></tr>
+        <tr><td class="qid">PT2-Q22c</td><td><span class="gap-cat arith">Cascading error</span></td><td>Method correct (volume × unit price); the volume input came from the incorrect result of (b)</td><td>The "volume × unit price = total cost" model itself is correct</td></tr>
       </tbody>
     </table>
   </div>
 </section>
 
 <!-- ===== Sec 3: Consolidation ===== -->
-<section id="sec3" class="section" data-views="teacher parent">
+<section id="sec3" class="section">
   <div class="section-header">
     <div class="section-title-block">
       <div class="section-eyebrow">§③ CONSOLIDATION GRADIENT</div>
-      <h1>巩固程度分级</h1>
-      <p class="section-subtitle">不是所有"会"都一样。在干预设计前，需要区分概念表征的成熟度。</p>
+      <h1>Consolidation gradient</h1>
+      <p class="section-subtitle">Not all "knowing" is equivalent. Before designing interventions, we need to distinguish the maturity of the underlying conceptual representations.</p>
     </div>
   </div>
   <div class="data-table">
     <div style="padding: 20px 24px;">
       <div style="display: grid; grid-template-columns: 180px 1fr; gap: 14px; padding: 12px 0; border-bottom: 1px solid var(--border);">
         <div><span class="badge ok">Robust</span></div>
-        <div style="font-size: 13px; color: var(--ink-secondary); line-height: 1.65;">在 ≥ 2 个独立题目和条件下都正确，包括时间压力下。</div>
+        <div style="font-size: 13px; color: var(--ink-secondary); line-height: 1.65;">Correct across ≥ 2 independent items and conditions, including under time pressure.</div>
       </div>
       <div style="display: grid; grid-template-columns: 180px 1fr; gap: 14px; padding: 12px 0; border-bottom: 1px solid var(--border);">
         <div><span class="badge" style="background: var(--blue-bg); color: var(--blue); border: 1px solid var(--blue-border);">Emerging</span></div>
-        <div style="font-size: 13px; color: var(--ink-secondary); line-height: 1.65;">标准条件下正确，未观察到压力下崩溃。</div>
+        <div style="font-size: 13px; color: var(--ink-secondary); line-height: 1.65;">Correct under standard conditions; no observed breakdown under pressure.</div>
       </div>
       <div style="display: grid; grid-template-columns: 180px 1fr; gap: 14px; padding: 12px 0; border-bottom: 1px solid var(--border);">
         <div><span class="badge warning">Recognised but unstable</span></div>
-        <div style="font-size: 13px; color: var(--ink-secondary); line-height: 1.65;">学生能写出正确公式或方法（概念表征存在），但执行不稳。PT1-Q11、PT1-Q22b 属于这一档。</div>
+        <div style="font-size: 13px; color: var(--ink-secondary); line-height: 1.65;">The student can write the correct formula or method (conceptual representation is present), but execution is unstable. PT1-Q11 and PT1-Q22b fall in this band.</div>
       </div>
       <div style="display: grid; grid-template-columns: 180px 1fr; gap: 14px; padding: 12px 0;">
         <div><span class="badge critical">Introduced not internalised</span></div>
-        <div style="font-size: 13px; color: var(--ink-secondary); line-height: 1.65;">没法把问题映射到正确程序；概念结构还没形成。Bearings、similar solids 属于这一档。</div>
+        <div style="font-size: 13px; color: var(--ink-secondary); line-height: 1.65;">Cannot map the problem onto the correct procedure; the conceptual structure has not yet formed. Bearings and similar solids fall in this band.</div>
       </div>
     </div>
   </div>
 </section>
 
 <!-- ===== Sec 4: Knowledge tree ===== -->
-<section id="sec4" class="section" data-views="teacher">
+<section id="sec4" class="section">
   <div class="section-header">
     <div class="section-title-block">
       <div class="section-eyebrow">§④ KNOWLEDGE TREE · BACKWARD PROGRESSION</div>
-      <h1>知识图谱回溯</h1>
-      <p class="section-subtitle">从当前年级（9-10）逐级向下追溯前置。点击任何节点查看证据、学习成分、官方标准原文。点击瓶颈节点 7.EE.A.2 会自动显示它的 fan-out。</p>
+      <h1>Knowledge tree — backward traversal</h1>
+      <p class="section-subtitle">Trace prerequisites downward from the current grade band (9-10). Click any node to view the evidence, learning components, and the official standard statement. Clicking the bottleneck node 7.EE.A.2 automatically reveals its forward fan-out.</p>
     </div>
   </div>
   <div class="kg-toolbar">
@@ -889,25 +817,25 @@ details code { font-family: 'JetBrains Mono', monospace; font-size: 11px; backgr
     </div>
   </div>
   <div class="kg-detail" id="kg-detail">
-    <div class="kg-detail-empty">点击任意节点查看官方标准原文、本次诊断的具体证据、学习成分（ANet 分解）</div>
+    <div class="kg-detail-empty">Click any node to view the official standard statement, evidence from this diagnostic, and learning components (ANet decomposition).</div>
   </div>
 </section>
 
 <!-- ===== Sec 5: Bottleneck ===== -->
-<section id="sec5" class="section" data-views="teacher">
+<section id="sec5" class="section">
   <div class="section-header">
     <div class="section-title-block">
       <div class="section-eyebrow">§⑤ BOTTLENECK ANALYSIS</div>
-      <h1>瓶颈节点分析</h1>
-      <p class="section-subtitle">在知识进阶图中，某些前置是多个下游标准的门户。修复这些节点会沿依赖链向下游传播正效应。</p>
+      <h1>Bottleneck node analysis</h1>
+      <p class="section-subtitle">In a standards progression graph, certain prerequisites act as gateways to multiple downstream standards. Repairing these nodes propagates positive effects downstream along the dependency chain.</p>
     </div>
   </div>
   <div class="bottleneck-hero">
     <div class="bottleneck-hero-code">🔴 BOTTLENECK · 7.EE.A.2</div>
-    <div class="bottleneck-hero-title">把"加法堆叠"翻译成"乘法堆叠"</div>
+    <div class="bottleneck-hero-title">Translating "additive stacking" into "multiplicative stacking"</div>
     <div class="bottleneck-body">
-      <strong>标准官方原文已经描述了 Xiao Ting 的核心错误：</strong>"Understand that rewriting an expression in different forms in a problem context can shed light on the problem and how the quantities in it are related. For example, a + 0.05a = 1.05a means that 'increase by 5%' is the same as 'multiply by 1.05.'"<br><br>
-      Xiao Ting 在 PT1-Q22a 写了 0.15 而不是 0.85（衰减 multiplier）。这是教科书级的 7.EE.A.2 失败——她还没内化加法语言（"减少 15%"）和乘法语言（"× 0.85"）的等价。这一个概念门户是她下游绝大多数高中 SSE 工作的前置。
+      <strong>The official standard statement already describes Xiao Ting's core error:</strong> "Understand that rewriting an expression in different forms in a problem context can shed light on the problem and how the quantities in it are related. For example, a + 0.05a = 1.05a means that 'increase by 5%' is the same as 'multiply by 1.05.'"<br><br>
+      On PT1-Q22a, Xiao Ting wrote 0.15 instead of 0.85 (the decay multiplier). This is a textbook 7.EE.A.2 failure — she has not yet internalised the equivalence between the additive language ("decrease by 15%") and the multiplicative language ("× 0.85"). This single conceptual gateway underlies the vast majority of her downstream high-school SSE work.
     </div>
     <div class="fanout-visual">
       <div class="fanout-visual-label">SAP-verified forward fan-out · 4 standards</div>
@@ -919,271 +847,271 @@ details code { font-family: 'JetBrains Mono', monospace; font-size: 11px; backgr
         <div class="leaf"><div class="leaf-code">HSA-SSE.B.3.b</div><div class="leaf-text">Complete the square</div></div>
         <div class="leaf"><div class="leaf-code">HSA-SSE.B.3.c</div><div class="leaf-text">Compound interest / decay (Q22)</div></div>
       </div>
-      <div style="font-size: 11px; color: var(--ink-muted); margin-top: 12px; font-style: italic;">通过 Learning Commons 验证：<code style="font-family: 'JetBrains Mono', monospace;">find_standards_progression_from_standard(direction='forward')</code>，UUID = 6b9d6fe1-d7cc-11e8-824f-0242ac160002。7.EE.A.2 在 SAP map 中没有上游前置，是一个干净的 root 节点。</div>
+      <div style="font-size: 11px; color: var(--ink-muted); margin-top: 12px; font-style: italic;">Verified via Learning Commons: <code style="font-family: 'JetBrains Mono', monospace;">find_standards_progression_from_standard(direction='forward')</code>, UUID = 6b9d6fe1-d7cc-11e8-824f-0242ac160002. 7.EE.A.2 has no upstream prerequisite in the SAP map; it is a clean root node.</div>
     </div>
   </div>
   <div style="background: linear-gradient(135deg, #faf5ff, #eff6ff); border: 1px solid var(--purple-border); border-radius: 12px; padding: 22px 24px;">
     <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--purple); letter-spacing: 1.5px; font-weight: 600;">🟣 SECONDARY · 6.RP.A.3.d</div>
-    <h3 style="color: var(--purple); margin-top: 4px;">单位换算中的 "rate as multiplier" 概念</h3>
-    <p style="font-size: 13px; color: var(--ink-secondary); line-height: 1.75; margin-top: 10px;">Speed conversion m/s → km/h 需要 ×3.6（PT2-Q19c 丢分）。这和瓶颈是同一个概念动作——把 rate 翻译成 multiplier。可以和 7.EE.A.2 在 Phase 1 一起训练。</p>
+    <h3 style="color: var(--purple); margin-top: 4px;">"Rate as multiplier" in unit conversion</h3>
+    <p style="font-size: 13px; color: var(--ink-secondary); line-height: 1.75; margin-top: 10px;">Speed conversion m/s → km/h requires ×3.6 (marks lost on PT2-Q19c). This is the same conceptual move as the bottleneck — translating a rate into a multiplier. It can be trained alongside 7.EE.A.2 during Phase 1.</p>
   </div>
 </section>
 
 <!-- ===== Sec 6: Factors ===== -->
-<section id="sec6" class="section" data-views="teacher">
+<section id="sec6" class="section">
   <div class="section-header">
     <div class="section-title-block">
       <div class="section-eyebrow">§⑥ INTERVENABLE FACTORS</div>
-      <h1>哪些因素在限制表现</h1>
-      <p class="section-subtitle">基于 Digital Promise Learner Variability Navigator (LVN) Math 7-10 模型，主因（cognitive load）锚定在 3 月 12 日初次诊断里最强的观察。</p>
+      <h1>Which factors are limiting performance</h1>
+      <p class="section-subtitle">Based on the Digital Promise Learner Variability Navigator (LVN) Math 7-10 model. The lead factor (cognitive load) is anchored on the strongest observation from the 12 March initial diagnostic.</p>
     </div>
   </div>
   <div class="factor-grid">
     <div class="factor-card lead">
       <div class="factor-icon">🧠</div>
-      <div class="factor-name">无计算器条件下的工作记忆超载 <span class="trainable med">可训练 · 中</span></div>
+      <div class="factor-name">Working memory overload under non-calculator conditions <span class="trainable med">Trainable · moderate</span></div>
       <div class="factor-cat">COGNITION · WORKING MEMORY · LEAD FACTOR</div>
-      <div class="factor-desc">本案核心因素，3 月 12 日初次诊断里最强的信号：<em>"频繁叹气、对环境噪音敏感；基础算术和程序执行耗尽大部分认知资源，留给逻辑推理的空间不足。"</em>按 Baddeley & Hitch 工作记忆模型，时间压力下的心算同时占用中央执行（决策）、phonological loop（口算）和 visuospatial sketchpad（图形处理）。三者都被占用时，自我监控的执行资源耗尽，产生观察到的三类错误：(1) 多步算术崩溃；(2) MCQ 选了又改；(3) 心算不留痕迹。</div>
+      <div class="factor-desc">The core factor in this case and the strongest signal from the 12 March initial diagnostic: <em>"Frequent sighing, sensitive to ambient noise; basic arithmetic and procedural execution consumed most of her cognitive resources, leaving insufficient capacity for logical reasoning."</em> Per the Baddeley &amp; Hitch working memory model, mental arithmetic under time pressure simultaneously occupies the central executive (decision-making), the phonological loop (verbal computation), and the visuospatial sketchpad (figure processing). When all three are loaded, the executive resource for self-monitoring is exhausted, producing the three observed error classes: (1) multi-step arithmetic collapse; (2) MCQ revisions (chose and changed); (3) mental computation leaving no written trace.</div>
       <div class="factor-impact">
-        <div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--ink-muted); letter-spacing: 1px; margin-bottom: 4px; text-transform: uppercase;">直接解释的题目</div>
+        <div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--ink-muted); letter-spacing: 1px; margin-bottom: 4px; text-transform: uppercase;">Items directly explained</div>
         <span class="impact-chip">PT1-Q11</span><span class="impact-chip">PT1-Q21a</span><span class="impact-chip">PT1-Q22b</span><span class="impact-chip">PT2-Q1</span><span class="impact-chip">PT2-Q10</span><span class="impact-chip">PT2-Q22c</span>
       </div>
     </div>
     <div class="factor-card">
       <div class="factor-icon">😰</div>
-      <div class="factor-name">考试焦虑 <span class="trainable med">可训练 · 中</span></div>
+      <div class="factor-name">Test anxiety <span class="trainable med">Trainable · moderate</span></div>
       <div class="factor-cat">EMOTION · MATH ANXIETY</div>
-      <div class="factor-desc">焦虑会占用工作记忆资源（Ashcraft & Kirk, 2001）。Xiao Ting 显示出"双选"模式——先选对，二次猜测后改错。表达性写作（Ramirez & Beilock, 2011）是证据充足的低成本干预。</div>
+      <div class="factor-desc">Anxiety consumes working memory resources (Ashcraft &amp; Kirk, 2001). Xiao Ting exhibits a "double-pick" pattern — initially correct, then changed to wrong upon second-guessing. Expressive writing (Ramirez &amp; Beilock, 2011) is a well-evidenced, low-cost intervention.</div>
     </div>
     <div class="factor-card">
       <div class="factor-icon">🎯</div>
-      <div class="factor-name">元认知校准 <span class="trainable high">可训练 · 高</span></div>
+      <div class="factor-name">Metacognitive calibration <span class="trainable high">Trainable · high</span></div>
       <div class="factor-cat">METACOGNITION · SELF-ASSESSMENT</div>
-      <div class="factor-desc">系统性预测偏差：低估近期掌握内容，高估熟悉但不稳定内容。4-6 周结构化"预测-验证"训练对此有强响应。这是最直接的元认知干预杠杆。</div>
+      <div class="factor-desc">Systematic predictive bias: she underestimates recently mastered content and overestimates familiar but unstable content. A 4-6 week structured "predict-verify" protocol responds strongly to this pattern. This is the most direct metacognitive intervention lever.</div>
     </div>
     <div class="factor-card">
       <div class="factor-icon">⏱</div>
-      <div class="factor-name">耐力 / 35 分钟疲劳阈值 <span class="trainable med">可训练 · 中</span></div>
+      <div class="factor-name">Stamina / 35-minute fatigue threshold <span class="trainable med">Trainable · moderate</span></div>
       <div class="factor-cat">SELF-REGULATION · STAMINA</div>
-      <div class="factor-desc">3 月 12 日观察显示 35 分钟后注意力衰减明显。CEM 全长 67 分钟，Phase 4 安排渐进时长训练（30→40→50→67 min）。</div>
+      <div class="factor-desc">The 12 March observation showed clear attentional decay after 35 minutes. The full-length CEM runs 67 minutes; Phase 4 schedules progressive duration training (30 → 40 → 50 → 67 min).</div>
     </div>
     <div class="factor-card">
       <div class="factor-icon">🗣</div>
-      <div class="factor-name">数学英语词汇 <span class="trainable high">可训练 · 高</span></div>
+      <div class="factor-name">Mathematical English vocabulary <span class="trainable high">Trainable · high</span></div>
       <div class="factor-cat">VOCABULARY · LANGUAGE</div>
-      <div class="factor-desc">Cambridge CEM / Perse 入学需要英文数学词汇精度。Bearings、probability 词汇双语卡组，5 min/day。Schleppegrell (2007), Cummins (2008) BICS/CALP。</div>
+      <div class="factor-desc">Cambridge CEM / Perse admissions require precision in English mathematical vocabulary. Bilingual flashcards for bearings and probability terms, 5 min/day. Schleppegrell (2007), Cummins (2008) BICS/CALP.</div>
     </div>
   </div>
 </section>
 
 <!-- ===== Sec 7: Character ===== -->
-<section id="sec7" class="section" data-views="teacher parent">
+<section id="sec7" class="section">
   <div class="section-header">
     <div class="section-title-block">
       <div class="section-eyebrow">§⑦ CHARACTER PROFILE · CALIBRATION</div>
-      <h1>学习者特质 + 元认知校准</h1>
-      <p class="section-subtitle">从 4 周观察推断的工作画像（不是诊断结论）。OCEAN 推断单点快照仅作工作假设，需要后续观察验证。</p>
+      <h1>Learner traits and metacognitive calibration</h1>
+      <p class="section-subtitle">A working profile inferred from approximately four weeks of observation (not a diagnostic conclusion). OCEAN inferences from a single snapshot serve only as working hypotheses and require validation through further observation.</p>
     </div>
   </div>
   <div class="char-grid">
     <div class="char-card">
-      <h4>Conscientiousness <span class="char-rating high">高</span></h4>
-      <p>步骤完整度（除 PT1-Q21a）、作业返还率、自发笔记习惯均高。错题反复重做意愿强。</p>
-      <div class="char-evidence">证据：PT1 自评封面 · 每次作业返还 · 错题本</div>
+      <h4>Conscientiousness <span class="char-rating high">High</span></h4>
+      <p>Step completeness (except PT1-Q21a), assignment return rate, and spontaneous note-taking habits are all high. Strong willingness to redo missed items.</p>
+      <div class="char-evidence">Evidence: PT1 self-assessment cover · every assignment returned · error notebook</div>
     </div>
     <div class="char-card">
-      <h4>Neuroticism <span class="char-rating med">中</span></h4>
-      <p>考试焦虑显著但不极端。"双选"模式、35 分钟疲劳阈值、考前情绪表达（"差不多吧"）是主要信号。</p>
-      <div class="char-evidence">证据：PT2-Q1, Q10 双选 · 3/12 观察</div>
+      <h4>Neuroticism <span class="char-rating med">Moderate</span></h4>
+      <p>Test anxiety is significant but not extreme. The "double-pick" pattern, the 35-minute fatigue threshold, and pre-test emotional expression ("more or less") are the principal signals.</p>
+      <div class="char-evidence">Evidence: PT2-Q1, Q10 double-picks · 12 March observation</div>
     </div>
     <div class="char-card">
-      <h4>Openness <span class="char-rating high">高</span></h4>
-      <p>新内容吸收快，对不熟悉题型愿意尝试。课程综述显示对政治、历史也有兴趣——支持真实的智识好奇。</p>
-      <div class="char-evidence">证据：3/19 Peer teaching 表现 · 课程综述</div>
+      <h4>Openness <span class="char-rating high">High</span></h4>
+      <p>Absorbs new content quickly; willing to attempt unfamiliar item types. Her course overview also shows interest in politics and history — supporting genuine intellectual curiosity.</p>
+      <div class="char-evidence">Evidence: 19 March peer-teaching performance · course overview</div>
     </div>
     <div class="char-card">
-      <h4>Growth vs fixed mindset <span class="char-rating mixed">过渡期</span></h4>
-      <p>正在转向 growth，尚未稳定。Growth 信号：重新接触错误、接受 peer teaching、新内容吸收快。Fixed 信号：考前防御性预测（"中等水平，容易达到"）、考后目标不具体。</p>
-      <div class="char-evidence">证据：考后 (d) 反思 · 考前"中等"锚定</div>
+      <h4>Growth vs fixed mindset <span class="char-rating mixed">Transitional</span></h4>
+      <p>Shifting toward a growth orientation; not yet stable. Growth signals: re-engages with errors, accepts peer teaching, absorbs new content quickly. Fixed signals: defensive pre-test prediction ("average level, easy to reach"), unspecific post-test goals.</p>
+      <div class="char-evidence">Evidence: post-test (d) reflection · pre-test "average" anchoring</div>
     </div>
     <div class="char-card">
-      <h4>Motivation type <span class="char-rating mixed">混合</span></h4>
-      <p>外部动机明确（Perse Year 9 目标），但<strong>不完全外驱</strong>。PT1 封面自评"长答题没认真做"是内在标准——她对"做好"有自己的定义。</p>
-      <div class="char-evidence">证据：PT1 封面自评 · 智识兴趣广度</div>
+      <h4>Motivation type <span class="char-rating mixed">Mixed</span></h4>
+      <p>External motivation is clear (the Perse Year 9 target), but <strong>not purely extrinsic</strong>. The PT1 cover self-assessment — "didn't take the long-answer items seriously" — reflects an internal standard: she has her own definition of "doing well."</p>
+      <div class="char-evidence">Evidence: PT1 cover self-assessment · breadth of intellectual interest</div>
     </div>
     <div class="char-card">
-      <h4>Self-assessment accuracy <span class="char-rating low">系统性偏差</span></h4>
-      <p><strong>非对称校准：</strong><span style="color: var(--green)">低估</span>近期掌握内容（三角函数 1/5 → 100%）；<span style="color: var(--red)">高估</span>熟悉但脆弱内容（不等式 3/5 → 50%）。这是元认知干预最直接的杠杆。</p>
-      <div class="char-evidence">证据：见下方校准表</div>
+      <h4>Self-assessment accuracy <span class="char-rating low">Systematic bias</span></h4>
+      <p><strong>Asymmetric calibration:</strong> <span style="color: var(--green)">underestimates</span> recently mastered content (trigonometry 1/5 → 100%); <span style="color: var(--red)">overestimates</span> familiar but fragile content (inequalities 3/5 → 50%). This is the most direct lever for metacognitive intervention.</p>
+      <div class="char-evidence">Evidence: see calibration table below</div>
     </div>
   </div>
   <h3 style="margin-top: 24px; margin-bottom: 8px;">📐 Self-assessment calibration (Test 2)</h3>
   <div class="calib-table">
     <div class="calib-row head"><div>Topic</div><div>Predicted</div><div>Actual</div><div>Gap</div><div>Calibration insight</div></div>
-    <div class="calib-row"><div>三角函数 (Pythagoras + ratios)</div><div class="conf">1/5</div><div class="conf">100%</div><div class="gap-val under">-3</div><div class="insight"><strong>严重低估。</strong> 新掌握内容还没整合进"我会"自我图式</div></div>
-    <div class="calib-row"><div>不等式与代数</div><div class="conf">3/5</div><div class="conf">50%</div><div class="gap-val over">+1</div><div class="insight">熟悉但不稳的内容容易高估</div></div>
-    <div class="calib-row"><div>概率</div><div class="conf">4/5</div><div class="conf">50%</div><div class="gap-val over">+2</div><div class="insight"><strong>过度自信。</strong> 基础概率稳，complement/tree 未巩固</div></div>
-    <div class="calib-row"><div>比例</div><div class="conf">4/5</div><div class="conf">100%</div><div class="gap-val cal">0</div><div class="insight">校准准确——她最稳的区域</div></div>
-    <div class="calib-row"><div>体积与表面积（含相似立体）</div><div class="conf">3/5</div><div class="conf">~33%</div><div class="gap-val over">+2</div><div class="insight">没区分"基础体积"和"相似立体"两个子难度</div></div>
+    <div class="calib-row"><div>Trigonometry (Pythagoras + ratios)</div><div class="conf">1/5</div><div class="conf">100%</div><div class="gap-val under">-3</div><div class="insight"><strong>Severe underestimate.</strong> Newly mastered content has not yet been integrated into the "I can do this" self-schema.</div></div>
+    <div class="calib-row"><div>Inequalities and algebra</div><div class="conf">3/5</div><div class="conf">50%</div><div class="gap-val over">+1</div><div class="insight">Familiar but unstable content is easy to overestimate.</div></div>
+    <div class="calib-row"><div>Probability</div><div class="conf">4/5</div><div class="conf">50%</div><div class="gap-val over">+2</div><div class="insight"><strong>Overconfident.</strong> Basic probability is stable; complement/tree are not yet consolidated.</div></div>
+    <div class="calib-row"><div>Ratio and proportion</div><div class="conf">4/5</div><div class="conf">100%</div><div class="gap-val cal">0</div><div class="insight">Calibration accurate — her most stable area.</div></div>
+    <div class="calib-row"><div>Volume and surface area (including similar solids)</div><div class="conf">3/5</div><div class="conf">~33%</div><div class="gap-val over">+2</div><div class="insight">Did not distinguish the two sub-difficulties of "basic volume" and "similar solids".</div></div>
   </div>
 </section>
 
 <!-- ===== Sec 8: Plan (read-only) ===== -->
-<section id="sec8" class="section" data-views="teacher parent">
+<section id="sec8" class="section">
   <div class="section-header">
     <div class="section-title-block">
       <div class="section-eyebrow">§⑧ INTERVENTION PLAN · READ-ONLY</div>
-      <h1>八周四阶段干预计划</h1>
-      <p class="section-subtitle">这里是报告中的计划原文。执行追踪请到左侧"干预执行"节，那里可以勾选已完成、写反思、看进度。</p>
+      <h1>Eight-week, four-phase intervention plan</h1>
+      <p class="section-subtitle">This is the plan as written in the report. For execution tracking, go to the "Intervention tracker" section in the left navigation, where strategies can be checked off, reflections recorded, and progress monitored.</p>
     </div>
     <div class="section-actions">
-      <button class="btn btn-secondary" onclick="showSection('intervention')">前往执行追踪 →</button>
+      <button class="btn btn-secondary" onclick="showSection('intervention')">Go to execution tracker →</button>
     </div>
   </div>
   <div style="background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 22px 26px;">
-    <p style="font-size: 13px; color: var(--ink-secondary); line-height: 1.7;">每条策略都标注了 <span class="strat-tag">LVN</span> 策略名、对应因素、研究依据。计划覆盖内容、学习习惯、数学思维、学习方法。与 3/12 报告的 8 周过渡课程兼容，并提供 Mindsweeper 视角的优先级精调。</p>
+    <p style="font-size: 13px; color: var(--ink-secondary); line-height: 1.7;">Each strategy is tagged with its <span class="strat-tag">LVN</span> name, the corresponding intervenable factor, and the research basis. The plan addresses content, study habits, mathematical thinking, and learning method. It is compatible with the eight-week transition programme from the 12 March report, with Mindsweeper-side priority refinements.</p>
     <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 18px;">
       <div style="background: var(--bg-content); padding: 14px 16px; border-radius: 8px;">
         <div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--ink-muted); letter-spacing: 1px; margin-bottom: 4px;">PHASE 1 · WK 1-2</div>
-        <div style="font-family: 'Source Serif 4', serif; font-weight: 600; font-size: 14px; margin-bottom: 4px;">修复瓶颈</div>
-        <div style="font-size: 12px; color: var(--ink-secondary);">7.EE.A.2 + 反向百分比、复利、二次不等式</div>
+        <div style="font-family: 'Source Serif 4', serif; font-weight: 600; font-size: 14px; margin-bottom: 4px;">Repair bottleneck</div>
+        <div style="font-size: 12px; color: var(--ink-secondary);">7.EE.A.2 + reverse percentage, compound interest, quadratic inequalities</div>
       </div>
       <div style="background: var(--bg-content); padding: 14px 16px; border-radius: 8px;">
         <div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--ink-muted); letter-spacing: 1px; margin-bottom: 4px;">PHASE 2 · WK 3-4</div>
-        <div style="font-family: 'Source Serif 4', serif; font-weight: 600; font-size: 14px; margin-bottom: 4px;">概念脚手架</div>
+        <div style="font-family: 'Source Serif 4', serif; font-weight: 600; font-size: 14px; margin-bottom: 4px;">Conceptual scaffolding</div>
         <div style="font-size: 12px; color: var(--ink-secondary);">bearings, similar solids, quadratic formula, indep events</div>
       </div>
       <div style="background: var(--bg-content); padding: 14px 16px; border-radius: 8px;">
         <div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--ink-muted); letter-spacing: 1px; margin-bottom: 4px;">PHASE 3 · WK 5-6</div>
-        <div style="font-family: 'Source Serif 4', serif; font-weight: 600; font-size: 14px; margin-bottom: 4px;">元认知校准</div>
-        <div style="font-size: 12px; color: var(--ink-secondary);">并行于 1-2 · 预测-验证训练</div>
+        <div style="font-family: 'Source Serif 4', serif; font-weight: 600; font-size: 14px; margin-bottom: 4px;">Metacognitive calibration</div>
+        <div style="font-size: 12px; color: var(--ink-secondary);">Runs in parallel with Phases 1-2 · predict-verify training</div>
       </div>
       <div style="background: var(--bg-content); padding: 14px 16px; border-radius: 8px;">
         <div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--ink-muted); letter-spacing: 1px; margin-bottom: 4px;">PHASE 4 · WK 7-8</div>
-        <div style="font-family: 'Source Serif 4', serif; font-weight: 600; font-size: 14px; margin-bottom: 4px;">整合 + 模拟</div>
-        <div style="font-size: 12px; color: var(--ink-secondary);">交叉练习、耐力、CEM 全长模拟</div>
+        <div style="font-family: 'Source Serif 4', serif; font-weight: 600; font-size: 14px; margin-bottom: 4px;">Integration + simulation</div>
+        <div style="font-size: 12px; color: var(--ink-secondary);">Interleaved practice, stamina, full-length CEM simulation</div>
       </div>
     </div>
   </div>
 </section>
 
 <!-- ===== Sec 9: Methodology ===== -->
-<section id="sec9" class="section" data-views="teacher">
+<section id="sec9" class="section">
   <div class="section-header">
     <div class="section-title-block">
       <div class="section-eyebrow">§⑨ METHODOLOGY</div>
-      <h1>来源、决策标准与局限</h1>
-      <p class="section-subtitle">所有判断的依据和边界，向同行可审视。</p>
+      <h1>Sources, decision criteria, and limitations</h1>
+      <p class="section-subtitle">The basis and boundaries of every judgement, transparent for peer review.</p>
     </div>
   </div>
   <div class="methodology-block">
     <details open>
-      <summary>Knowledge Graph MCP 查询流程</summary>
+      <summary>Knowledge Graph MCP query workflow</summary>
       <div>
-        每个标准通过 3 次实时 API 调用解析：<br>
-        <strong>(1)</strong> <code>find_standard_statement</code> 配 <code>Multi-State</code> jurisdiction。重要发现：高中标准（9-12 年级）需要 <code>HS</code> 前缀。<br>
-        <strong>(2)</strong> <code>find_learning_components_from_standard</code> 用 CASE network UUID。关键发现：官方 ANet 分解与直觉切分有显著差异。<code>HSA-REI.B.4.b</code> 有 7 个官方 LCs，"method selection" 是独立成分。<br>
-        <strong>(3)</strong> <code>find_standards_progression_from_standard</code> 配 forward/backward 方向。关键修正：v1 假说 <code>8.EE.A.1</code> 是瓶颈被经验性否决——其 forward chain 指向 logarithms 和 scientific notation。已验证瓶颈是 <code>7.EE.A.2</code>，向 SSE family fan-out = 4。
+        Each standard is resolved through three live API calls:<br>
+        <strong>(1)</strong> <code>find_standard_statement</code> with the <code>Multi-State</code> jurisdiction. Key finding: high-school standards (Grades 9-12) require the <code>HS</code> prefix.<br>
+        <strong>(2)</strong> <code>find_learning_components_from_standard</code> using the CASE network UUID. Key finding: the official ANet decomposition differs substantially from an intuitive partition. <code>HSA-REI.B.4.b</code> has 7 official LCs, and "method selection" is its own component.<br>
+        <strong>(3)</strong> <code>find_standards_progression_from_standard</code> with forward/backward direction. Key correction: the v1 hypothesis that <code>8.EE.A.1</code> was the bottleneck was empirically rejected — its forward chain points to logarithms and scientific notation. The verified bottleneck is <code>7.EE.A.2</code>, with a fan-out of 4 into the SSE family.
       </div>
     </details>
     <details>
-      <summary>巩固梯度分级标准</summary>
-      <div><strong>Robust:</strong> 在 ≥ 2 个独立题目和条件下正确。<br><strong>Emerging:</strong> 标准条件下正确。<br><strong>Recognised but unstable:</strong> 概念表征存在但执行不稳。<br><strong>Introduced not internalised:</strong> 概念结构尚未形成。</div>
+      <summary>Consolidation gradient grading criteria</summary>
+      <div><strong>Robust:</strong> correct across ≥ 2 independent items and conditions.<br><strong>Emerging:</strong> correct under standard conditions.<br><strong>Recognised but unstable:</strong> conceptual representation present but execution unstable.<br><strong>Introduced not internalised:</strong> conceptual structure not yet formed.</div>
     </details>
     <details>
-      <summary>Performance vs knowledge gap 归因</summary>
-      <div>4 个信号：(1) 方法写在纸上；(2) 类似题在更早正确；(3) 错误模式匹配认知超载特征；(4) 跨测试反向证据。框架基于 Newman (1977) 错误分析层次。</div>
+      <summary>Performance vs knowledge gap attribution</summary>
+      <div>Four signals: (1) method visible on paper; (2) a similar item answered correctly earlier; (3) error pattern matches the cognitive-overload signature; (4) cross-test counter-evidence. The framework is based on Newman's (1977) error-analysis hierarchy.</div>
     </details>
     <details>
-      <summary>CCSS-Edexcel 映射的局限</summary>
-      <div>Bearings 原映射到 <code>7.G.A.2</code>，API 显示不合适。Similar solids 原映射到 <code>HSG-MG.A.1</code>，API 显示不合适。CCSS 没有专门覆盖这两个 Edexcel-only topic 的标准。方法论含义：Mindsweeper 用 CCSS 作主干时，Edexcel-only topics 应标 placeholder。</div>
+      <summary>Limitations of CCSS-Edexcel mapping</summary>
+      <div>Bearings was initially mapped to <code>7.G.A.2</code>, which the API showed to be inappropriate. Similar solids was initially mapped to <code>HSG-MG.A.1</code>, which the API also rejected. CCSS contains no standard that specifically covers these two Edexcel-only topics. Methodological implication: when Mindsweeper uses CCSS as the backbone, Edexcel-only topics should be marked as placeholders.</div>
     </details>
     <details>
-      <summary>适用范围与局限</summary>
-      <div>① 标准主干是 CCSS-M；学生实际课程是 Edexcel GCSE 9-1 Foundation。<br>② 知识进阶链反映逻辑前置关系，不一定是教学顺序。<br>③ 特质和因素分析基于 ~4 周数据，是工作假设而非定论。<br>④ Performance vs knowledge 归因涉及判断；每个归因附明确证据。<br>⑤ LVN 策略有群体级研究支持；个体响应有差异。</div>
+      <summary>Scope and limitations</summary>
+      <div>① The standards backbone is CCSS-M; the student's actual curriculum is Edexcel GCSE 9-1 Foundation.<br>② The standards progression chain reflects logical prerequisite relationships, not necessarily instructional order.<br>③ Trait and factor analyses are based on roughly four weeks of data and constitute working hypotheses rather than settled conclusions.<br>④ Performance-versus-knowledge attribution involves judgement; every attribution is accompanied by explicit evidence.<br>⑤ LVN strategies have population-level research support; individual responses vary.</div>
     </details>
   </div>
 </section>
 
 <!-- ===== Tool: New test entry ===== -->
-<section id="tool-newtest" class="section" data-views="teacher">
+<section id="tool-newtest" class="section">
   <div class="section-header">
     <div class="section-title-block">
       <div class="section-eyebrow">TOOL · NEW DIAGNOSTIC INPUT</div>
-      <h1>录入新测试</h1>
-      <p class="section-subtitle">完成后系统会自动通过 Learning Commons API 校验每道题的 CCSS 锚点、查找 LCs、计算 progression chain，生成报告草稿。教师审阅修改后发布。</p>
+      <h1>Enter a new test</h1>
+      <p class="section-subtitle">Once submitted, the system uses the Learning Commons API to automatically verify each item's CCSS anchor, retrieve learning components, and compute the progression chain, generating a draft report. The teacher reviews and edits before publishing.</p>
     </div>
     <div class="section-actions">
-      <button class="btn btn-ghost">从模板导入</button>
-      <button class="btn btn-primary">生成报告草稿</button>
+      <button class="btn btn-ghost">Import from template</button>
+      <button class="btn btn-primary">Generate draft report</button>
     </div>
   </div>
   <div class="form-block">
     <div class="field-row">
-      <div class="field"><label>测试名称</label><input type="text" value="PT3 · Cambridge CEM Mock 1"></div>
-      <div class="field"><label>测试日期</label><input type="date" value="2026-05-25"></div>
+      <div class="field"><label>Test name</label><input type="text" value="PT3 · Cambridge CEM Mock 1"></div>
+      <div class="field"><label>Test date</label><input type="date" value="2026-05-25"></div>
     </div>
     <div class="field-row">
-      <div class="field"><label>课程 / 范围</label>
+      <div class="field"><label>Course / scope</label>
         <select><option>Edexcel GCSE 9-1 Foundation</option><option>Edexcel GCSE 9-1 Higher</option><option>Cambridge CEM Year 9</option><option>IB MYP 5</option></select>
       </div>
-      <div class="field"><label>条件</label>
-        <select><option>无计算器 · 限时</option><option>有计算器 · 限时</option><option>无计算器 · 无限时</option></select>
+      <div class="field"><label>Conditions</label>
+        <select><option>Non-calculator · timed</option><option>Calculator · timed</option><option>Non-calculator · untimed</option></select>
       </div>
     </div>
     <div style="margin-top: 24px; padding-top: 18px; border-top: 1px solid var(--border);">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-        <h3 style="font-size: 14px;">题目录入</h3>
-        <button class="btn btn-secondary">+ 添加题目</button>
+        <h3 style="font-size: 14px;">Item entry</h3>
+        <button class="btn btn-secondary">+ Add item</button>
       </div>
       <div class="item-row">
         <input type="text" value="Q22a">
-        <select><option>HSA-SSE.B.3.c</option><option>7.EE.A.2</option><option>(自动建议)</option></select>
+        <select><option>HSA-SSE.B.3.c</option><option>7.EE.A.2</option><option>(auto-suggest)</option></select>
         <select><option>0/2</option><option>1/2</option><option>2/2</option></select>
         <input type="text" value="wrote 0.15 instead of 0.85">
         <button class="item-remove">✕</button>
       </div>
       <div class="item-row">
         <input type="text" value="Q23">
-        <select><option>HSA-REI.B.4.b</option><option>(自动建议)</option></select>
+        <select><option>HSA-REI.B.4.b</option><option>(auto-suggest)</option></select>
         <select><option>0/3</option><option>1/3</option><option>2/3</option><option>3/3</option></select>
         <input type="text" value="quadratic formula not applied, attempted factoring">
         <button class="item-remove">✕</button>
       </div>
       <div class="item-row">
         <input type="text" placeholder="Q…">
-        <select><option>(自动建议)</option></select>
+        <select><option>(auto-suggest)</option></select>
         <select><option>—</option></select>
-        <input type="text" placeholder="错误描述">
+        <input type="text" placeholder="Error description">
         <button class="item-remove">✕</button>
       </div>
     </div>
     <div style="margin-top: 24px; padding: 14px 16px; background: var(--blue-bg); border: 1px solid var(--blue-border); border-radius: 8px; font-size: 12.5px; color: var(--ink-secondary); line-height: 1.7;">
-      <strong style="color: var(--blue);">下一步会发生什么：</strong>点 "生成报告草稿" 后，系统会对每个 CCSS 代码运行 3 次 Learning Commons API 调用、把错误描述按 §② 归因 taxonomy 自动分类、识别可能的瓶颈节点，最后生成与本报告同结构的草稿。教师可以修改任何一处，然后发布。
+      <strong style="color: var(--blue);">What happens next:</strong> after you click "Generate draft report", the system runs three Learning Commons API calls for each CCSS code, classifies the error descriptions automatically using the §② attribution taxonomy, identifies candidate bottleneck nodes, and finally produces a draft with the same structure as this report. The teacher can edit any field before publishing.
     </div>
   </div>
 </section>
 
 <!-- ===== Tool: Verify standards ===== -->
-<section id="tool-verify" class="section" data-views="teacher">
+<section id="tool-verify" class="section">
   <div class="section-header">
     <div class="section-title-block">
       <div class="section-eyebrow">TOOL · STANDARD VERIFICATION</div>
-      <h1>Learning Commons 校验</h1>
-      <p class="section-subtitle">本报告引用的所有 CCSS 标准、LCs、进阶链都来自 Learning Commons MCP。这里可以批量重新校验，自动 diff 出与上次的差异。</p>
+      <h1>Learning Commons verification</h1>
+      <p class="section-subtitle">All CCSS standards, learning components, and progression chains cited in this report originate from Learning Commons MCP. From here you can batch re-verify; the system automatically diffs against the previous run.</p>
     </div>
     <div class="section-actions">
-      <button class="btn btn-primary">重新校验全部 (14)</button>
+      <button class="btn btn-primary">Re-verify all (14)</button>
     </div>
   </div>
   <div class="data-table">
     <div class="table-toolbar">
-      <span class="filter-chip active">全部 14</span>
-      <span class="filter-chip">已验证 12</span>
-      <span class="filter-chip">需复核 0</span>
-      <span class="filter-chip">无锚点 2</span>
+      <span class="filter-chip active">All 14</span>
+      <span class="filter-chip">Verified 12</span>
+      <span class="filter-chip">Needs review 0</span>
+      <span class="filter-chip">No anchor 2</span>
       <span class="filter-spacer"></span>
-      <span class="filter-count">最近一次：5 月 20 日 14:32</span>
+      <span class="filter-count">Last run: 20 May 14:32</span>
     </div>
     <div style="padding: 14px 16px;">
       <div style="display: grid; grid-template-columns: 150px 1fr 100px 100px; gap: 14px; padding: 10px 0; border-bottom: 1px solid var(--border); align-items: center; font-size: 12px;">
@@ -1221,42 +1149,42 @@ details code { font-family: 'JetBrains Mono', monospace; font-size: 11px; backgr
 </section>
 
 <!-- ===== Tool: Parent preview ===== -->
-<section id="tool-parent" class="section" data-views="teacher">
+<section id="tool-parent" class="section">
   <div class="section-header">
     <div class="section-title-block">
       <div class="section-eyebrow">TOOL · PARENT-FACING VIEW</div>
-      <h1>家长版预览</h1>
-      <p class="section-subtitle">同一份诊断数据，换一种语言。无 CCSS 代码、无术语堆砌，聚焦"这意味着什么、接下来两周会做什么"。教师审阅后才能对外发送。</p>
+      <h1>Parent-facing preview</h1>
+      <p class="section-subtitle">The same diagnostic data in a different register. No CCSS codes or jargon stacking — the focus is on "what this means and what we will do in the next two weeks". Requires teacher review before being sent.</p>
     </div>
     <div class="section-actions">
-      <button class="btn btn-ghost">复制链接</button>
-      <button class="btn btn-secondary">编辑</button>
-      <button class="btn btn-primary">发送给家长</button>
+      <button class="btn btn-ghost">Copy link</button>
+      <button class="btn btn-secondary">Edit</button>
+      <button class="btn btn-primary">Send to parents</button>
     </div>
   </div>
   <div class="parent-preview-wrap">
     <div class="parent-preview-meta">
       <span style="font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: var(--blue); font-weight: 600;">PREVIEW</span>
-      <span>这是家长打开链接后会看到的内容 · 截至 5 月 25 日 · 由 Paula Zheng 审阅</span>
+      <span>This is what parents will see when they open the link · as of 25 May · reviewed by Paula Zheng</span>
     </div>
-    <div class="parent-greeting">致 Yu 同学的家长：</div>
-    <div class="parent-block">过去 8 周的诊断给了我们一个清晰的画像：<strong>潇婷的数学基础其实相当扎实——代数操作、毕达哥拉斯、比例、函数都做得很好</strong>。她目前丢分的地方<strong>不是她"不会"</strong>，而是有一个特定的概念门槛和一些考试时的执行问题。</div>
+    <div class="parent-greeting">Dear Yu family,</div>
+    <div class="parent-block">The diagnostics over the past eight weeks give us a clear picture: <strong>Xiao Ting's mathematical foundation is actually quite solid — algebraic manipulation, Pythagoras, ratio, and functions are all in good shape</strong>. The places where she is currently losing marks <strong>are not "things she doesn't know"</strong>; they trace to one specific conceptual gate and a handful of execution issues during testing.</div>
     <div class="parent-callout">
-      <strong>核心发现：</strong>潇婷需要补的不是一长串知识点，而是<strong>一个关键的"翻译"动作</strong>——把"减少 15%"这种加法语言翻译成"乘以 0.85"这种乘法语言。这一个概念修复，会同时解决复利、反向百分比、二次方程式等四类下游题型。
+      <strong>Core finding:</strong> what Xiao Ting needs to address is not a long list of topics but <strong>one key "translation" move</strong> — translating additive language such as "decrease by 15%" into multiplicative language such as "multiply by 0.85". Repairing this single concept simultaneously resolves four downstream item families: compound interest, reverse percentage, quadratic equations, and similar.
     </div>
-    <div style="font-family: 'Source Serif 4', serif; font-size: 16px; font-weight: 600; margin-top: 24px; margin-bottom: 10px;">未来两周（Phase 1）会做什么</div>
+    <div style="font-family: 'Source Serif 4', serif; font-size: 16px; font-weight: 600; margin-top: 24px; margin-bottom: 10px;">What we will do in the next two weeks (Phase 1)</div>
     <ol class="parent-next-list">
-      <li><span class="num">1</span><span>用 <strong>6 张错误样例卡组</strong>训练"+5% 等同于 ×1.05"的转换。每次先看一个错误解法，让她找出错在哪——这比直接给正解记忆效果好得多。</span></li>
-      <li><span class="num">2</span><span>每节 15 分钟的<strong>口头推理</strong>。让她出声向我解释"为什么 multiplier 是 0.85 而不是 0.15"。卡住时不打断——挣扎本身是学习发生的地方。</span></li>
-      <li><span class="num">3</span><span>建立"<strong>纸面三步规则</strong>"：任何多步题先写"已知-需求-方法"再开始算。两周内做到自动化。</span></li>
+      <li><span class="num">1</span><span>Use a <strong>6-card error-example deck</strong> to train the "+5% is equivalent to ×1.05" conversion. Each time she begins with a flawed solution and has to identify where it went wrong — substantially more effective than handing her the correct solution to memorise.</span></li>
+      <li><span class="num">2</span><span>Fifteen minutes per session of <strong>verbal reasoning</strong>. Have her explain aloud "why the multiplier is 0.85 and not 0.15". Do not interrupt when she gets stuck — the struggle itself is where learning happens.</span></li>
+      <li><span class="num">3</span><span>Establish a "<strong>three-step paper rule</strong>": for any multi-step problem, first write "given — required — method", then begin computing. The goal is for this to become automatic within two weeks.</span></li>
     </ol>
-    <div style="font-family: 'Source Serif 4', serif; font-size: 16px; font-weight: 600; margin-top: 24px; margin-bottom: 10px;">家长可以怎么支持</div>
+    <div style="font-family: 'Source Serif 4', serif; font-size: 16px; font-weight: 600; margin-top: 24px; margin-bottom: 10px;">How parents can support</div>
     <div class="parent-block">
-      <strong>不需要</strong>额外的题海。潇婷做题量足够，需要的是把每道题做透。如果她做错了一道题，别问"为什么错了"，问"如果再做一次你会怎么做"——这是 metacognitive prompts，研究证据非常充足。<br><br>
-      Phase 1 末（约 6 月 8 日）会有一个 8 题的诊断检查点，目标是 ≥ 75%。届时我会发一份简短的进度更新。
+      <strong>No need</strong> for additional drill volume. Xiao Ting already does enough problems; what she needs is to work each one through thoroughly. When she gets an item wrong, rather than asking "why did you get it wrong?" ask "if you did it again, what would you do differently?" These are metacognitive prompts and have very strong research support.<br><br>
+      At the end of Phase 1 (around 8 June) there will be an 8-item diagnostic checkpoint with a target of ≥ 75%. I will send a brief progress update at that point.
     </div>
     <div style="margin-top: 28px; padding-top: 18px; border-top: 1px solid var(--border); font-size: 12px; color: var(--ink-muted); line-height: 1.7;">
-      想看更详细的内容？教师端报告里有逐题归因、知识进阶图、研究依据等技术细节。如果想了解，可以约个 30 分钟视频说明。<br>— Paula
+      Would you like to see more detail? The teacher-facing report contains per-item attribution, the standards progression graph, the underlying research, and other technical detail. If you would like a walkthrough, we can schedule a 30-minute video call.<br>— Paula
     </div>
   </div>
 </section>
@@ -1266,37 +1194,6 @@ details code { font-family: 'JetBrains Mono', monospace; font-size: 11px; backgr
 </div>
 
 <script>
-// === View switcher (teacher / parent / student) ===
-const viewButtons = document.querySelectorAll('[data-view-btn]');
-function isVisibleInView(navItem, view) {
-  const views = (navItem.dataset.views || 'teacher').split(/\s+/);
-  return views.includes(view);
-}
-function setView(view) {
-  document.body.dataset.view = view;
-  viewButtons.forEach(b => b.classList.toggle('active', b.dataset.viewBtn === view));
-  // If the currently-active section isn't visible in this view, jump to dashboard
-  const activeSection = document.querySelector('.section.active');
-  if (activeSection) {
-    const sectionViews = (activeSection.dataset.views || 'teacher').split(/\s+/);
-    if (!sectionViews.includes(view)) {
-      showSection('dashboard');
-    }
-  }
-  // Persist so refresh keeps the view
-  try { localStorage.setItem('mindsweeper:view', view); } catch (e) {}
-}
-viewButtons.forEach(btn => {
-  btn.addEventListener('click', () => setView(btn.dataset.viewBtn));
-});
-// Restore prior view selection on load
-try {
-  const saved = localStorage.getItem('mindsweeper:view');
-  if (saved && ['teacher', 'parent', 'student'].includes(saved)) {
-    setView(saved);
-  }
-} catch (e) {}
-
 // === Navigation ===
 const navItems = document.querySelectorAll('.nav-item');
 const sections = document.querySelectorAll('.section');
@@ -1307,12 +1204,7 @@ function showSection(id) {
   if (id === 'trajectory') setTimeout(renderTraj, 50);
 }
 navItems.forEach(item => {
-  item.addEventListener('click', () => {
-    // Don't navigate to a section not visible in the current view
-    const view = document.body.dataset.view || 'teacher';
-    if (!isVisibleInView(item, view)) return;
-    showSection(item.dataset.target);
-  });
+  item.addEventListener('click', () => showSection(item.dataset.target));
 });
 
 // === Trajectory chart ===
@@ -1363,18 +1255,18 @@ function renderTraj() {
 
 // === Topic table (Section 1) ===
 const topics = [
-  { name: 'Similar solids (area/volume scaling)', code: 'No CCSS anchor — Edexcel-specific', score: 0, status: 'critical', label: 'Intervene', evidence: 'PT2-Q22 · introduced not internalised. CCSS 没有干净锚点。' },
-  { name: 'Compound percentage / decay', code: 'HSA-SSE.B.3.c', score: 0, status: 'critical', label: 'Intervene', evidence: 'PT1-Q22a: 写 0.15 而非 0.85；Q22b: 公式正确但算成 9900（应 11054）。瓶颈 7.EE.A.2 的下游。' },
-  { name: 'Bearings', code: 'No CCSS anchor — Edexcel-specific', score: 0, status: 'critical', label: 'Intervene', evidence: 'PT2-Q3: 计算成 180-65 而非 65+180——方向弄反。' },
-  { name: 'Quadratic formula (non-factorisable)', code: 'HSA-REI.B.4.b', score: 0, status: 'critical', label: 'Intervene', evidence: 'PT2-Q23: 不会切换到公式法。"Method selection" 在 ANet 分解里是独立 LC。' },
-  { name: 'Independent events · complement logic', code: '7.SP.C.8', score: 50, status: 'warning', label: 'Watch', evidence: '基础概率稳，complement 和 tree 扩展不稳。' },
-  { name: 'Quadratic inequalities · sign analysis', code: 'HSA-REI.B.4.b', score: 50, status: 'warning', label: 'Watch', evidence: 'PT2-Q1 双选 A 和 C，最终选错——焦虑下二次猜测。' },
-  { name: 'Unit conversion (speed)', code: '6.RP.A.3.d', score: 50, status: 'warning', label: 'Watch', evidence: 'PT2-Q19c: m/s → km/h 需 ×3.6 不熟悉。与瓶颈同概念动作。' },
-  { name: '2-D shape properties (rhombus/rectangle)', code: '5.G.B.4', score: 50, status: 'warning', label: 'Watch', evidence: '基本概念在，边界情况判断弱。' },
-  { name: 'Algebraic manipulation (incl. expansion)', code: 'HSA-SSE.A.2', score: 100, status: 'ok', label: 'Strength', evidence: '展开、合并、化简都稳定。' },
-  { name: 'Pythagoras and basic trigonometry', code: '8.G.B.7 / HSG-SRT.C.8', score: 100, status: 'ok', label: 'Strength', evidence: 'PT2-Q13, Q23a 全对。' },
-  { name: 'Ratio and proportion', code: '7.RP.A.2 / 7.RP.A.3', score: 90, status: 'ok', label: 'Strength', evidence: '4 道全对——她最稳的区域。' },
-  { name: 'Simultaneous equations and function evaluation', code: 'HSA-REI.C.6 / 8.F.A.1', score: 100, status: 'ok', label: 'Strength', evidence: 'PT1-Q9 正确。' }
+  { name: 'Similar solids (area/volume scaling)', code: 'No CCSS anchor — Edexcel-specific', score: 0, status: 'critical', label: 'Intervene', evidence: 'PT2-Q22 · introduced not internalised. CCSS has no clean anchor.' },
+  { name: 'Compound percentage / decay', code: 'HSA-SSE.B.3.c', score: 0, status: 'critical', label: 'Intervene', evidence: 'PT1-Q22a: wrote 0.15 instead of 0.85; Q22b: formula correct but computed as 9900 (should be 11054). Downstream of bottleneck 7.EE.A.2.' },
+  { name: 'Bearings', code: 'No CCSS anchor — Edexcel-specific', score: 0, status: 'critical', label: 'Intervene', evidence: 'PT2-Q3: computed 180−65 rather than 65+180 — direction inverted.' },
+  { name: 'Quadratic formula (non-factorisable)', code: 'HSA-REI.B.4.b', score: 0, status: 'critical', label: 'Intervene', evidence: 'PT2-Q23: did not switch to the formula method. "Method selection" is its own LC in the ANet decomposition.' },
+  { name: 'Independent events · complement logic', code: '7.SP.C.8', score: 50, status: 'warning', label: 'Watch', evidence: 'Basic probability stable; complement and tree extensions unstable.' },
+  { name: 'Quadratic inequalities · sign analysis', code: 'HSA-REI.B.4.b', score: 50, status: 'warning', label: 'Watch', evidence: 'PT2-Q1 double-picked A and C, ultimately chose the wrong one — second-guessing under anxiety.' },
+  { name: 'Unit conversion (speed)', code: '6.RP.A.3.d', score: 50, status: 'warning', label: 'Watch', evidence: 'PT2-Q19c: m/s → km/h requiring ×3.6 not yet fluent. Same conceptual move as the bottleneck.' },
+  { name: '2-D shape properties (rhombus/rectangle)', code: '5.G.B.4', score: 50, status: 'warning', label: 'Watch', evidence: 'Basic concept present; edge-case judgement weak.' },
+  { name: 'Algebraic manipulation (incl. expansion)', code: 'HSA-SSE.A.2', score: 100, status: 'ok', label: 'Strength', evidence: 'Expansion, combining, and simplification all stable.' },
+  { name: 'Pythagoras and basic trigonometry', code: '8.G.B.7 / HSG-SRT.C.8', score: 100, status: 'ok', label: 'Strength', evidence: 'PT2-Q13 and Q23a all correct.' },
+  { name: 'Ratio and proportion', code: '7.RP.A.2 / 7.RP.A.3', score: 90, status: 'ok', label: 'Strength', evidence: '4 items all correct — her most stable area.' },
+  { name: 'Simultaneous equations and function evaluation', code: 'HSA-REI.C.6 / 8.F.A.1', score: 100, status: 'ok', label: 'Strength', evidence: 'PT1-Q9 correct.' }
 ];
 function renderTopics(filter) {
   filter = filter || 'all';
@@ -1411,18 +1303,18 @@ const kgData = {
   "HSA-SSE.A.1": { title: "Interpret expressions in context", grade: "9-10", status: "downstream", code: "HSA-SSE.A.1", text: "Interpret expressions that represent a quantity in terms of its context.", live: true, note: "Forward downstream from 7.EE.A.2." },
   "HSA-SSE.B.3.a": { title: "Factor to reveal zeros", grade: "9-10", status: "downstream", code: "HSA-SSE.B.3.a", text: "Factor a quadratic expression to reveal the zeros of the function it defines.", live: true, note: "Forward downstream from 7.EE.A.2." },
   "HSA-SSE.B.3.b": { title: "Complete the square to reveal extrema", grade: "9-10", status: "downstream", code: "HSA-SSE.B.3.b", text: "Complete the square in a quadratic expression to reveal the maximum or minimum value.", live: true, note: "Forward downstream from 7.EE.A.2." },
-  "8.EE.A.1": { title: "Properties of integer exponents", grade: "8", status: "ok", code: "8.EE.A.1", evidence: [{q:"PT1-Q4", n:"2⁵ = 32 — correct"}], note: "v1 假说：这是瓶颈。SAP forward chain 实际指向 logarithms / scientific notation。假说被 API 否决。" },
+  "8.EE.A.1": { title: "Properties of integer exponents", grade: "8", status: "ok", code: "8.EE.A.1", evidence: [{q:"PT1-Q4", n:"2⁵ = 32 — correct"}], note: "v1 hypothesis: this was the bottleneck. The SAP forward chain in fact points to logarithms / scientific notation. The hypothesis was rejected by the API." },
   "8.G.B.7": { title: "Pythagorean theorem", grade: "8", status: "ok", code: "8.G.B.7", evidence: [{q:"PT2-Q13", n:"correct"},{q:"PT2-Q23a", n:"correct"}] },
   "8.F.A.1": { title: "Functions and evaluation", grade: "8", status: "ok", code: "8.F.A.1", evidence: [{q:"PT1-Q9", n:"correct"}] },
-  "8.F.B.4": { title: "Linear function rate of change", grade: "8", status: "prerequisite", code: "8.F.B.4", note: "前置——未直接测试。" },
-  "7.EE.A.2": { title: "Rewriting expressions to reveal relationships", grade: "7", status: "bottleneck", code: "7.EE.A.2", text: "Understand that rewriting an expression in different forms in a problem context can shed light on the problem. For example, a + 0.05a = 1.05a means that 'increase by 5%' is the same as 'multiply by 1.05.'", live: true, fanOut: [{c:"HSA-SSE.A.1", n:"Interpret expressions in context"},{c:"HSA-SSE.B.3.a", n:"Factor to reveal zeros"},{c:"HSA-SSE.B.3.b", n:"Complete the square"},{c:"HSA-SSE.B.3.c", n:"Exponential transforms (Q22)"}], evidence: [{q:"PT1-Q22a", n:"wrote 0.15 instead of 0.85 — textbook 7.EE.A.2 failure"}], lcs: ["Rewrite an expression in different forms in a problem context","Interpret how quantities in an expression are related ✗ (the core gap)"], note: "SAP-verified root node：在 Coherence Map 中没有上游前置。Fan-out = 4。当前隐藏的 3 个 Grade 9-10 节点会在点击此节点时显示。" },
+  "8.F.B.4": { title: "Linear function rate of change", grade: "8", status: "prerequisite", code: "8.F.B.4", note: "Prerequisite — not directly tested." },
+  "7.EE.A.2": { title: "Rewriting expressions to reveal relationships", grade: "7", status: "bottleneck", code: "7.EE.A.2", text: "Understand that rewriting an expression in different forms in a problem context can shed light on the problem. For example, a + 0.05a = 1.05a means that 'increase by 5%' is the same as 'multiply by 1.05.'", live: true, fanOut: [{c:"HSA-SSE.A.1", n:"Interpret expressions in context"},{c:"HSA-SSE.B.3.a", n:"Factor to reveal zeros"},{c:"HSA-SSE.B.3.b", n:"Complete the square"},{c:"HSA-SSE.B.3.c", n:"Exponential transforms (Q22)"}], evidence: [{q:"PT1-Q22a", n:"wrote 0.15 instead of 0.85 — textbook 7.EE.A.2 failure"}], lcs: ["Rewrite an expression in different forms in a problem context","Interpret how quantities in an expression are related ✗ (the core gap)"], note: "SAP-verified root node: no upstream prerequisite in the Coherence Map. Fan-out = 4. The three currently hidden Grade 9-10 nodes will appear when this node is clicked." },
   "7.RP.A.2": { title: "Proportional relationships", grade: "7", status: "ok", code: "7.RP.A.2", evidence: [{q:"PT2-Q4", n:"correct"},{q:"PT2-Q5", n:"correct"},{q:"PT2-Q6", n:"correct"},{q:"PT2-Q21", n:"correct"}] },
-  "7.RP.A.3": { title: "Multi-step ratio and percent problems", grade: "7", status: "warning", score: "unstable", code: "7.RP.A.3", evidence: [{q:"PT1-Q11", n:"反向百分比方法正确；链式乘法在无计算器下算错"}], lcs: ["Multi-step ratio problems ✓","Multi-step percent problems — 教过但压力下不稳"] },
-  "7.SP.C.8": { title: "Compound event probability", grade: "7", status: "prerequisite", code: "7.SP.C.8", note: "Independent events 是独立 LC。PT2 显示 50%——识别但不稳。" },
+  "7.RP.A.3": { title: "Multi-step ratio and percent problems", grade: "7", status: "warning", score: "unstable", code: "7.RP.A.3", evidence: [{q:"PT1-Q11", n:"Reverse-percentage method correct; chained multiplication miscalculated under non-calculator conditions"}], lcs: ["Multi-step ratio problems ✓","Multi-step percent problems — taught but unstable under pressure"] },
+  "7.SP.C.8": { title: "Compound event probability", grade: "7", status: "prerequisite", code: "7.SP.C.8", note: "Independent events is its own LC. PT2 shows 50% — recognised but unstable." },
   "6.RP.A.1": { title: "Ratio concept and simplification", grade: "6", status: "ok", code: "6.RP.A.1", evidence: [{q:"PT2-Q4", n:"correct"},{q:"PT2-Q21a", n:"correct"}] },
   "6.NS.B.4": { title: "HCF and LCM", grade: "6", status: "ok", code: "6.NS.B.4", evidence: [{q:"PT1-Q2", n:"correct"},{q:"PT1-Q3", n:"correct"}] },
-  "6.RP.A.3.d": { title: "Unit conversion via ratio reasoning", grade: "6", status: "warning", score: "partial", code: "6.RP.A.3.d", evidence: [{q:"PT2-Q19c", n:"m/s → km/h 需 ×3.6 — 不熟练"}], note: "和 7.EE.A.2 是同一个概念动作。在 Phase 1 一起训练。" },
-  "6.G.A.2": { title: "Volume formulas and 3-D geometry", grade: "6", status: "prerequisite", code: "6.G.A.2", note: "相似立体推理的基础。" }
+  "6.RP.A.3.d": { title: "Unit conversion via ratio reasoning", grade: "6", status: "warning", score: "partial", code: "6.RP.A.3.d", evidence: [{q:"PT2-Q19c", n:"m/s → km/h requires ×3.6 — not yet fluent"}], note: "Same conceptual move as 7.EE.A.2. Train alongside it during Phase 1." },
+  "6.G.A.2": { title: "Volume formulas and 3-D geometry", grade: "6", status: "prerequisite", code: "6.G.A.2", note: "Foundation for similar-solid reasoning." }
 };
 
 const kgDetailEl = document.getElementById('kg-detail');
@@ -1465,9 +1357,9 @@ function renderKgDetail(id) {
   }
   if (d.note) html += '<div class="kg-section"><div class="kg-section-label">Note</div><div class="kg-note">' + esc(d.note) + '</div></div>';
   html += '<div class="kg-actions">';
-  if (!d.edexcel) html += '<button class="btn btn-secondary" onclick="alert(\'重新调用 Learning Commons API（教师端会真正执行）\')">↻ 重新校验</button>';
-  html += '<button class="btn btn-secondary" onclick="showSection(\'intervention\')">+ 加入干预计划</button>';
-  html += '<button class="btn btn-ghost" onclick="showSection(\'tool-parent\')">→ 家长版表述</button>';
+  if (!d.edexcel) html += '<button class="btn btn-secondary" onclick="alert(\'Re-call Learning Commons API (teacher view will actually execute)\')">↻ Re-verify</button>';
+  html += '<button class="btn btn-secondary" onclick="showSection(\'intervention\')">+ Add to intervention plan</button>';
+  html += '<button class="btn btn-ghost" onclick="showSection(\'tool-parent\')">→ Parent-facing wording</button>';
   html += '</div>';
   kgDetailEl.innerHTML = html;
 }
@@ -1519,7 +1411,7 @@ function updateP1Progress() {
   const fill = document.getElementById('p1-progress');
   const label = document.getElementById('p1-progress-label');
   if (fill) fill.style.width = pct + '%';
-  if (label) label.textContent = done + '/' + p1.length + ' 策略已执行';
+  if (label) label.textContent = done + '/' + p1.length + ' strategies executed';
 }
 checks.forEach(c => {
   c.addEventListener('click', () => {
