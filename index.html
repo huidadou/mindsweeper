@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mindsweeper — End-to-end flow</title>
+<style>
+  :root {
+    --bg: #fbfaf6;
+    --surface: #ffffff;
+    --ink: #1a1a1a;
+    --ink-muted: #5f5e5a;
+    --ink-faint: #999;
+    --border: #e0ddd6;
+    --serif: 'Source Serif 4', 'Source Serif Pro', Georgia, serif;
+    --sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    --mono: 'JetBrains Mono', 'SF Mono', Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 40px 24px 60px;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--sans);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  .container { max-width: 920px; margin: 0 auto; }
+  header { margin-bottom: 32px; padding-bottom: 24px; border-bottom: 1px solid var(--border); }
+  h1 {
+    font-family: var(--serif);
+    font-size: 28px;
+    font-weight: 600;
+    margin: 0 0 6px;
+    letter-spacing: -0.01em;
+  }
+  .sub { color: var(--ink-muted); font-size: 14px; }
+  .meta { margin-top: 14px; font-size: 11px; color: var(--ink-faint); font-family: var(--mono); letter-spacing: 0.5px; }
+  .stage { margin: 32px 0; }
+  .stage-label {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 1.5px;
+    color: var(--ink-muted);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+    font-weight: 600;
+  }
+  .stage-title {
+    font-family: var(--serif);
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0 0 4px;
+  }
+  .stage-desc {
+    color: var(--ink-muted);
+    font-size: 13px;
+    margin: 0 0 18px;
+  }
+
+  /* Flow nodes */
+  .row { display: flex; justify-content: center; align-items: flex-start; gap: 16px; flex-wrap: wrap; }
+  .row + .arrow { margin: 4px 0; }
+  .node {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 18px;
+    font-size: 13.5px;
+    color: var(--ink);
+    min-width: 140px;
+    text-align: center;
+    line-height: 1.4;
+  }
+  .node .title { font-weight: 600; }
+  .node .subtitle { font-size: 11.5px; color: var(--ink-muted); margin-top: 4px; }
+
+  .node.purple { border-color: #AFA9EC; background: #EEEDFE; color: #3C3489; }
+  .node.purple .subtitle { color: #534AB7; }
+  .node.teal { border-color: #5DCAA5; background: #E1F5EE; color: #085041; }
+  .node.teal .subtitle { color: #0F6E56; }
+  .node.teal.featured { border-width: 2px; box-shadow: 0 1px 3px rgba(15,110,86,0.15); }
+  .node.blue { border-color: #85B7EB; background: #E6F1FB; color: #0C447C; }
+  .node.blue .subtitle { color: #185FA5; }
+  .node.blue.featured { border-width: 2px; box-shadow: 0 1px 3px rgba(24,95,165,0.15); }
+  .node.coral { border-color: #F0997B; background: #FAECE7; color: #712B13; }
+  .node.coral .subtitle { color: #993C1D; }
+  .node.amber { border-color: #EF9F27; background: #FAEEDA; color: #633806; }
+  .node.amber .subtitle { color: #854F0B; }
+  .node.green { border-color: #97C459; background: #EAF3DE; color: #27500A; }
+  .node.green .subtitle { color: #3B6D11; }
+  .node.faded { opacity: 0.55; font-style: italic; }
+  .node .badge {
+    display: inline-block;
+    font-size: 9.5px;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: #0F6E56;
+    color: white;
+    margin-left: 6px;
+    vertical-align: middle;
+  }
+  .node .badge.num { background: #534AB7; }
+
+  /* Shared blackboard — a data store, not an agent: dashed to set it apart */
+  .blackboard {
+    max-width: 660px;
+    margin: 0 auto;
+    background: #F1EFE8;
+    border: 1.5px dashed #B4B2A9;
+    border-radius: 10px;
+    padding: 14px 22px;
+    text-align: center;
+    color: #444441;
+  }
+  .blackboard .title { font-weight: 600; font-size: 14px; }
+  .blackboard .subtitle { font-size: 11.5px; color: #5f5e5a; margin-top: 4px; }
+
+  .arrow { display: flex; justify-content: center; color: var(--ink-faint); }
+  .arrow.center::after { content: '↓'; font-size: 18px; }
+  .arrow.updown::after { content: '↕'; font-size: 18px; }
+  .arrow.note {
+    font-size: 11px;
+    color: var(--ink-muted);
+    font-family: var(--mono);
+    text-align: center;
+  }
+
+  .branch-arrows {
+    display: flex;
+    justify-content: space-around;
+    color: var(--ink-faint);
+    font-size: 18px;
+    margin: 4px 0;
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .branch-arrows span { width: 33.3%; text-align: center; }
+
+  .lane-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+    max-width: 700px;
+    margin: 0 auto;
+  }
+  .lane-row.four {
+    grid-template-columns: repeat(4, 1fr);
+    max-width: 820px;
+    gap: 12px;
+  }
+  .lane-row .node { width: 100%; min-width: auto; }
+
+  .unified-report {
+    max-width: 380px;
+    margin: 0 auto;
+    background: linear-gradient(135deg, #E1F5EE 0%, #F1F8F4 100%);
+    border: 2px solid #5DCAA5;
+    border-radius: 14px;
+    padding: 20px 24px;
+    text-align: center;
+  }
+  .unified-report .title {
+    font-family: var(--serif);
+    font-weight: 600;
+    font-size: 17px;
+    color: #085041;
+    margin-bottom: 6px;
+  }
+  .unified-report .code {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: #0F6E56;
+    margin-bottom: 6px;
+  }
+  .unified-report .desc {
+    font-size: 12.5px;
+    color: #2a5546;
+  }
+
+  footer {
+    margin-top: 50px;
+    padding-top: 18px;
+    border-top: 1px solid var(--border);
+    font-size: 11.5px;
+    color: var(--ink-faint);
+    text-align: center;
+    line-height: 1.7;
+  }
+  footer code {
+    font-family: var(--mono);
+    background: var(--surface);
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+    color: var(--ink-muted);
+  }
+
+  .print-note {
+    margin: 20px 0 0;
+    padding: 12px 16px;
+    background: rgba(63,107,172,0.06);
+    border: 1px solid rgba(63,107,172,0.2);
+    border-radius: 8px;
+    font-size: 12.5px;
+    color: #2a4670;
+    line-height: 1.6;
+  }
+  @media print {
+    body { background: white; padding: 20px; }
+    .print-note { display: none; }
+    .node, .unified-report { box-shadow: none !important; }
+  }
+
+  @media (max-width: 720px) {
+    .lane-row, .lane-row.four { grid-template-columns: 1fr; }
+    .row { flex-direction: column; align-items: center; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+<header>
+  <h1>Mindsweeper — end-to-end flow</h1>
+  <div class="sub">From multi-agent assessment to three-audience report</div>
+  <div class="meta">v0.3 · 2026-06-04 · Multi-agent architecture reference</div>
+</header>
+
+<!-- STAGE 1: COLLECTION -->
+<section class="stage">
+  <div class="stage-label">Stage 1 · Agent app</div>
+  <h2 class="stage-title">Evidence collection</h2>
+  <p class="stage-desc">The React app that gathers raw evidence. Three roles, three input modes, branches based on what the user has. Each branch produces evidence — not a finished report.</p>
+
+  <div class="row"><div class="node">Landing</div></div>
+  <div class="arrow center"></div>
+  <div class="row"><div class="node purple"><div class="title">Role select</div><div class="subtitle">Student · Parent · Teacher</div></div></div>
+  <div class="arrow center"></div>
+  <div class="row"><div class="node">Intake</div></div>
+  <div class="arrow center"></div>
+  <div class="row"><div class="node">Confirm details</div></div>
+  <div class="arrow center"></div>
+  <div class="row"><div class="node purple"><div class="title">Input choice</div><div class="subtitle">Parent / Teacher only</div></div></div>
+
+  <div class="arrow note">Student → skips input_choice, goes straight to live chat + portfolio</div>
+
+  <div class="lane-row" style="margin-top: 12px;">
+    <div class="node teal featured"><div class="title">Both <span class="badge">REC</span></div><div class="subtitle">PDF + transcript</div></div>
+    <div class="node"><div class="title">Written only</div><div class="subtitle">PDF, no chat</div></div>
+    <div class="node"><div class="title">Conversation only</div><div class="subtitle">Transcript, no PDF</div></div>
+  </div>
+
+  <div class="branch-arrows"><span>↓</span><span>↓</span><span>↓</span></div>
+
+  <div class="lane-row">
+    <div class="node blue"><div class="title">Portfolio upload</div></div>
+    <div class="node blue"><div class="title">Portfolio upload</div></div>
+    <div class="node coral"><div class="title">Transcript upload</div></div>
+  </div>
+
+  <div class="branch-arrows"><span>↓</span><span>↓</span><span></span></div>
+
+  <div class="lane-row">
+    <div class="node coral"><div class="title">Transcript upload</div></div>
+    <div class="node faded"><div class="title">(skip chat)</div></div>
+    <div class="node faded"><div class="title">(no portfolio)</div></div>
+  </div>
+
+  <div class="branch-arrows"><span>↓</span><span>↓</span><span>↓</span></div>
+
+  <div class="lane-row">
+    <div class="node teal"><div class="title">Evidence bundle</div><div class="subtitle">portfolio + transcript</div></div>
+    <div class="node amber"><div class="title">Evidence: portfolio</div><div class="subtitle">requires_chat → gaps flagged</div></div>
+    <div class="node teal"><div class="title">Evidence: transcript</div><div class="subtitle">dialogue only</div></div>
+  </div>
+
+  <div class="arrow note" style="margin-top: 14px;">all evidence streams converge → assessment engine</div>
+  <div class="arrow center"></div>
+</section>
+
+<!-- STAGE 2: MULTI-AGENT ENGINE -->
+<section class="stage">
+  <div class="stage-label">Stage 2 · Assessment engine</div>
+  <h2 class="stage-title">Six agents, one blackboard</h2>
+  <p class="stage-desc">Evidence from any mode is normalised into a shared student model. Four assessors read and write it; the orchestrator drives live probing and assembles the report; the planner turns the profile into intervention.</p>
+
+  <!-- Three evidence sources -->
+  <div class="lane-row">
+    <div class="node teal"><div class="title">Live Socratic chat</div><div class="subtitle">real-time probing</div></div>
+    <div class="node teal"><div class="title">Portfolio analysis</div><div class="subtitle">uploaded work, PDFs</div></div>
+    <div class="node teal"><div class="title">Offline transcript</div><div class="subtitle">prior dialogue</div></div>
+  </div>
+
+  <div class="arrow note" style="margin-top: 10px;">writes evidence ↓ · sources triangulate every finding</div>
+
+  <!-- Blackboard -->
+  <div class="blackboard">
+    <div class="title">Shared student model — the blackboard</div>
+    <div class="subtitle">every agent reads &amp; writes here · the system of record, not an agent</div>
+  </div>
+
+  <div class="arrow updown" style="margin-top: 6px;"></div>
+  <div class="arrow note">read evidence · write findings + confidence + open gaps</div>
+
+  <!-- Four assessors -->
+  <div class="lane-row four" style="margin-top: 10px;">
+    <div class="node purple"><div class="title">Knowledge &amp; Skill</div><div class="subtitle">mastery · errors · transfer</div></div>
+    <div class="node purple"><div class="title">Mindset &amp; Motivation</div><div class="subtitle">drivers · growth vs fixed</div></div>
+    <div class="node purple"><div class="title">Resilience &amp; Affect</div><div class="subtitle">persistence · anxiety</div></div>
+    <div class="node purple"><div class="title">Metacognition &amp; Comms</div><div class="subtitle">calibration · explaining</div></div>
+  </div>
+
+  <div class="arrow note" style="margin-top: 10px;">OCEAN is not owned by any one assessor — the orchestrator derives it from logged behaviour</div>
+  <div class="arrow center"></div>
+
+  <!-- Orchestrator -->
+  <div class="row">
+    <div class="node blue featured" style="min-width: 320px;">
+      <div class="title">Orchestrator <span class="badge num">5 of 6</span></div>
+      <div class="subtitle">runs the live loop · derives OCEAN · assembles the report</div>
+    </div>
+  </div>
+
+  <div class="arrow note" style="margin-top: 8px;">↻ live mode only: reads open gaps → picks the single next probe → back to live chat</div>
+  <div class="arrow center"></div>
+
+  <!-- Intervention planner -->
+  <div class="row">
+    <div class="node amber" style="min-width: 320px;">
+      <div class="title">Intervention planner <span class="badge num">6 of 6</span></div>
+      <div class="subtitle">Stage-2 work · 8-week plan: knowledge · mindset · habit · problem-solving</div>
+    </div>
+  </div>
+</section>
+
+<!-- STAGE 3: UNIFIED REPORT -->
+<section class="stage">
+  <div class="stage-label">Stage 3 · Unified report</div>
+  <h2 class="stage-title">One report, one data contract</h2>
+  <p class="stage-desc">The orchestrator merges each assessor's region of the blackboard into a single JSON report, written to <code style="font-family: var(--mono); font-size: 11.5px;">localStorage</code> as a bridge between the agent app and the teacher console.</p>
+
+  <div class="unified-report">
+    <div class="title">One unified report</div>
+    <div class="code">localStorage.mindsweeper:latestReport</div>
+    <div class="desc">Knowledge map + Mathematical character (incl. OCEAN) + Intervention plan + Narrative summary</div>
+  </div>
+</section>
+
+<!-- STAGE 4: TEACHER CONSOLE -->
+<section class="stage">
+  <div class="stage-label">Stage 4 · Teacher console</div>
+  <h2 class="stage-title">Report viewer — three audience views</h2>
+  <p class="stage-desc">Same underlying data, three voices. Each view shows / hides / rephrases sections based on the audience. Switched via toggle in the topbar.</p>
+
+  <div class="arrow note">Toggle view in topbar →</div>
+
+  <div class="lane-row">
+    <div class="node green">
+      <div class="title">Student view</div>
+      <div class="subtitle" style="margin-top: 8px; text-align: left; line-height: 1.7;">
+        Warm · encouraging<br>
+        Minimal jargon<br>
+        Growth framing<br>
+        2nd-person voice
+      </div>
+    </div>
+    <div class="node amber">
+      <div class="title">Parent view</div>
+      <div class="subtitle" style="margin-top: 8px; text-align: left; line-height: 1.7;">
+        Concerned · supportive<br>
+        Plain language<br>
+        Action suggestions<br>
+        Ways to help at home
+      </div>
+    </div>
+    <div class="node blue">
+      <div class="title">Teacher view</div>
+      <div class="subtitle" style="margin-top: 8px; text-align: left; line-height: 1.7;">
+        Diagnostic · professional<br>
+        Full CCSS detail<br>
+        All 16 sections visible<br>
+        Intervention plans
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="print-note">
+  <strong>To share this:</strong> save the file (Ctrl/Cmd + S), email or upload directly. Or print to PDF (Ctrl/Cmd + P). The diagram is self-contained — no external assets, no scripts.
+</div>
+
+<footer>
+  Six agents · one blackboard · one data contract · <code>localStorage</code> bridge<br>
+  Collect evidence → assessment engine → unified report → Teacher console displays<br>
+  <span style="opacity: 0.7; font-size: 10.5px; letter-spacing: 0.5px; font-family: var(--mono); margin-top: 6px; display: inline-block;">MINDSWEEPER · v0.3 ARCHITECTURE</span>
+</footer>
+
+</div>
+</body>
+</html>
