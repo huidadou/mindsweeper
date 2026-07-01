@@ -153,6 +153,13 @@
     max-width: 820px;
     gap: 12px;
   }
+  .lane-row.five {
+    grid-template-columns: repeat(5, 1fr);
+    max-width: 940px;
+    gap: 10px;
+  }
+  .lane-row.five .node { min-width: auto; padding: 10px 11px; }
+  .lane-row.five .node .subtitle { font-size: 10.5px; }
   .lane-row .node { width: 100%; min-width: auto; }
  
   .unified-report {
@@ -200,19 +207,8 @@
     color: var(--ink-muted);
   }
  
-  .print-note {
-    margin: 20px 0 0;
-    padding: 12px 16px;
-    background: rgba(63,107,172,0.06);
-    border: 1px solid rgba(63,107,172,0.2);
-    border-radius: 8px;
-    font-size: 12.5px;
-    color: #2a4670;
-    line-height: 1.6;
-  }
   @media print {
     body { background: white; padding: 20px; }
-    .print-note { display: none; }
     .node, .unified-report { box-shadow: none !important; }
   }
  
@@ -231,7 +227,7 @@
   .lane-merge { text-align: center; font-family: var(--mono); font-size: 11px; color: var(--ink-muted); margin: 16px auto 4px; padding-top: 16px; border-top: 1px dashed var(--border); max-width: 600px; }
  
   @media (max-width: 720px) {
-    .lane-row, .lane-row.four { grid-template-columns: 1fr; }
+    .lane-row, .lane-row.four, .lane-row.five { grid-template-columns: 1fr; }
     .row { flex-direction: column; align-items: center; }
     .two-lane { grid-template-columns: 1fr; }
     .lane-divider { display: none; }
@@ -249,14 +245,14 @@
   </div>
   <h1>Mindsweeper: end-to-end flow</h1>
   <div class="sub">From multi-agent assessment to three-audience report</div>
-  <div class="meta">v0.4 · 2026-06-04 · Multi-agent architecture reference · 7 agents</div>
+  <div class="meta">v0.5 · 2026-07-01 · Multi-agent architecture reference · 8 agents</div>
 </header>
  
 <!-- STAGE 1: COLLECTION -->
 <section class="stage">
   <div class="stage-label">Stage 1 · Agent app</div>
   <h2 class="stage-title">Evidence collection</h2>
-  <p class="stage-desc">Two entry paths into the same assessment engine. Students complete a live Socratic session directly; the Orchestrator runs the conversation in real time. Parents and teachers upload existing materials (portfolio, transcript, or both). Both paths produce structured evidence for the blackboard.</p>
+  <p class="stage-desc">Two entry paths into the same engine. A student works through a portfolio step, the M³ self-report instruments and a short working-memory check, then a live session in one of two modes. Parents and teachers instead upload existing materials (portfolio, transcript, or both). Both paths produce structured evidence for the blackboard.</p>
  
   <div class="row"><div class="node">Landing</div></div>
   <div class="arrow center"></div>
@@ -270,12 +266,17 @@
       <div class="node"><div class="title">Intake</div><div class="subtitle">grade · syllabus · confidence · goal</div></div>
       <div class="arrow center"></div>
       <div class="node"><div class="title">Confirm details</div></div>
-      <div class="arrow note" style="font-size:10px;text-align:center;margin:4px 0;width:100%;max-width:310px">(skips input choice)</div>
-      <div class="node teal featured"><div class="title">Live Socratic session</div><div class="subtitle">Orchestrator-driven · real-time probing</div></div>
-      <div class="arrow center"></div>
       <div class="node blue"><div class="title">Portfolio upload</div><div class="subtitle">past work · optional</div></div>
       <div class="arrow center"></div>
-      <div class="node teal"><div class="title">Evidence bundle</div><div class="subtitle">live chat + portfolio</div></div>
+      <div class="node purple"><div class="title">M³ self-reports</div><div class="subtitle">SRQ-A · MAI · CYRM-R</div></div>
+      <div class="arrow center"></div>
+      <div class="node amber"><div class="title">Working-memory check</div><div class="subtitle">digit span · word span · Capacity</div></div>
+      <div class="arrow center"></div>
+      <div class="node purple"><div class="title">Mode select</div><div class="subtitle">Socratic · Choose your question · Skip</div></div>
+      <div class="arrow center"></div>
+      <div class="node teal featured"><div class="title">Live session</div><div class="subtitle">open Socratic or chosen-question walkthrough</div></div>
+      <div class="arrow center"></div>
+      <div class="node teal"><div class="title">Evidence bundle</div><div class="subtitle">self-reports + spans + chat + portfolio</div></div>
     </div>
  
     <!-- DIVIDER -->
@@ -324,8 +325,8 @@
 <!-- STAGE 2: MULTI-AGENT ENGINE -->
 <section class="stage">
   <div class="stage-label">Stage 2 · Assessment engine</div>
-  <h2 class="stage-title">Seven agents, one blackboard</h2>
-  <p class="stage-desc">Evidence from any mode is normalised and written to a shared student model. Portfolio evidence passes through a dedicated ingestion agent before reaching the blackboard. Four assessors read and write simultaneously; the orchestrator drives live probing and assembles the report; the planner turns the profile into a targeted intervention.</p>
+  <h2 class="stage-title">Eight agents, one blackboard</h2>
+  <p class="stage-desc">Evidence from any mode is normalised and written to a shared student model. Portfolio evidence passes through a dedicated ingestion agent first. Five assessors read and write simultaneously across the three layers — Content, Control and Capacity; the orchestrator drives live probing and assembles the report; the planner turns the profile into a targeted intervention.</p>
  
   <!-- Three evidence sources -->
   <div class="lane-row">
@@ -334,13 +335,13 @@
     <div class="node teal"><div class="title">Offline transcript</div><div class="subtitle">prior dialogue</div></div>
   </div>
  
-  <div class="arrow note" style="margin-top: 10px;">live chat + transcript write directly to blackboard · portfolio passes through ingestion agent first</div>
+  <div class="arrow note" style="margin-top: 10px;">live chat, self-reports &amp; span tasks write directly to the blackboard · portfolio passes through the ingestion agent first</div>
   <div class="arrow center"></div>
  
   <!-- Portfolio Ingestion Agent -->
   <div class="row">
     <div class="node blue" style="min-width: 320px;">
-      <div class="title">Portfolio Ingestion Agent <span class="badge num">5 of 7</span></div>
+      <div class="title">Portfolio Ingestion Agent <span class="badge num">7 of 8</span></div>
       <div class="subtitle">OCR + step extraction · crossings-out → resilience signals · schema: {question_ref, steps[], corrections[], ocr_confidence}</div>
     </div>
   </div>
@@ -357,43 +358,47 @@
   <div class="arrow note">read evidence · write findings + confidence + open gaps</div>
  
   <!-- Four assessors -->
-  <div class="lane-row four" style="margin-top: 10px;">
+  <div class="lane-row five" style="margin-top: 10px;">
     <div class="node purple">
-      <div class="title">Knowledge &amp; Skill <span class="badge num">1</span></div>
-      <div class="subtitle">mastery · errors · transfer · SAP Coherence Map</div>
+      <div class="title">Knowledge &amp; Skill <span class="badge num">2</span></div>
+      <div class="subtitle">Content · mastery · errors · transfer · SAP Coherence Map</div>
     </div>
     <div class="node purple">
-      <div class="title">Mindset &amp; Motivation <span class="badge num">2</span></div>
-      <div class="subtitle">SDT spectrum · growth vs fixed · Dweck (2006)</div>
-    </div>
-    <div class="node purple">
-      <div class="title">Resilience &amp; Affect <span class="badge num">3</span></div>
-      <div class="subtitle">cliff vs slope · anxiety · Yeager &amp; Dweck (2012)</div>
+      <div class="title">Mindset &amp; Motivation <span class="badge num">3</span></div>
+      <div class="subtitle">Control · SDT spectrum · SRQ-A · Dweck (2006)</div>
     </div>
     <div class="node purple">
       <div class="title">Metacognition &amp; Comms <span class="badge num">4</span></div>
-      <div class="subtitle">calibration gap · ICAP · Flavell (1979)</div>
+      <div class="subtitle">Control · calibration · MAI · Flavell (1979)</div>
+    </div>
+    <div class="node purple">
+      <div class="title">Resilience &amp; Affect <span class="badge num">5</span></div>
+      <div class="subtitle">Control · cliff vs slope · CYRM-R · Yeager &amp; Dweck (2012)</div>
+    </div>
+    <div class="node teal">
+      <div class="title">Cognitive <span class="badge num">6</span></div>
+      <div class="subtitle">Capacity · working memory · digit &amp; word span · load ceiling</div>
     </div>
   </div>
  
-  <div class="arrow note" style="margin-top: 10px;">OCEAN is derived by the Orchestrator from behavioural primitives logged across all four assessors</div>
+  <div class="arrow note" style="margin-top: 10px;">self-report (survey) and observed (dialogue) reads are held side by side · the Orchestrator computes their convergence per dimension</div>
   <div class="arrow center"></div>
  
   <!-- Orchestrator -->
   <div class="row">
     <div class="node blue featured" style="min-width: 340px;">
-      <div class="title">Orchestrator <span class="badge num">6 of 7</span></div>
-      <div class="subtitle">runs the live loop · reads open gaps · derives OCEAN · assembles the report · amotivation interrupt</div>
+      <div class="title">Orchestrator <span class="badge num">1 of 8</span></div>
+      <div class="subtitle">runs the live loop · reads open gaps · computes convergence · assembles the report · amotivation interrupt</div>
     </div>
   </div>
  
-  <div class="arrow note" style="margin-top: 8px;">↻ live mode only: reads open gaps → picks single next probe type (Reasoning / Perturbation / Teaching / Calibration) → back to live chat</div>
+  <div class="arrow note" style="margin-top: 8px;">↻ live mode only: reads open gaps → picks the next probe (Reasoning / Perturbation / Teaching / Calibration / Frustration / Capacity / Structural) → back to live chat</div>
   <div class="arrow center"></div>
  
   <!-- Intervention planner -->
   <div class="row">
     <div class="node amber" style="min-width: 340px;">
-      <div class="title">Intervention Planner <span class="badge num">7 of 7</span></div>
+      <div class="title">Intervention Planner <span class="badge num">8 of 8</span></div>
       <div class="subtitle">SDT-gated strategies · topological sort of prerequisite graph · LVN strategy library · ANet decomposition</div>
     </div>
   </div>
@@ -408,7 +413,7 @@
   <div class="unified-report">
     <div class="title">One unified report</div>
     <div class="code">localStorage.mindsweeper:latestReport</div>
-    <div class="desc">Knowledge map + Mathematical character (incl. OCEAN) + Intervention plan + Narrative summary</div>
+    <div class="desc">Knowledge map (Content) + Mathematical character / M³ (Control) + Cognitive profile (Capacity) + Intervention plan + Narrative summary</div>
   </div>
 </section>
  
@@ -444,25 +449,21 @@
       <div class="subtitle" style="margin-top: 8px; text-align: left; line-height: 1.7;">
         Diagnostic · professional<br>
         Full CCSS detail<br>
-        All 16 sections visible<br>
+        All sections visible<br>
         Intervention plans
       </div>
     </div>
   </div>
 </section>
  
-<div class="print-note">
-  <strong>To share this:</strong> save the file (Ctrl/Cmd + S), email or upload directly. Or print to PDF (Ctrl/Cmd + P). The diagram is self-contained: no external assets, no scripts.
-</div>
- 
 <footer>
-  Seven agents · one blackboard · one data contract · <code>localStorage</code> bridge<br>
+  Eight agents · one blackboard · one data contract · <code>localStorage</code> bridge<br>
   Collect evidence → assessment engine → unified report → Teacher console displays<br>
   <div style="margin-top:14px;display:flex;justify-content:center;gap:28px;flex-wrap:wrap;">
     <a href="./index.html" style="font-family:var(--mono);font-size:10.5px;color:var(--ink-faint);text-decoration:none;letter-spacing:0.5px;" onmouseover="this.style.color='#0F6E56'" onmouseout="this.style.color=''">← Homepage</a>
     <a href="./Mindsweeper_Teacher_Console_1.html" target="_blank" style="font-family:var(--mono);font-size:10.5px;color:var(--ink-faint);text-decoration:none;letter-spacing:0.5px;" onmouseover="this.style.color='#0F6E56'" onmouseout="this.style.color=''">Demo dashboard →</a>
   </div>
-  <span style="opacity: 0.7; font-size: 10.5px; letter-spacing: 0.5px; font-family: var(--mono); margin-top: 6px; display: inline-block;">MINDSWEEPER · v0.4 ARCHITECTURE</span>
+  <span style="opacity: 0.7; font-size: 10.5px; letter-spacing: 0.5px; font-family: var(--mono); margin-top: 6px; display: inline-block;">MINDSWEEPER · v0.5 ARCHITECTURE</span>
 </footer>
  
 </div>
