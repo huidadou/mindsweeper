@@ -392,6 +392,7 @@ details code { font-family: 'JetBrains Mono', monospace; font-size: 11px; backgr
   <div class="nav-group">
     <div class="nav-group-header">This student</div>
     <div class="nav-item active" data-target="dashboard"><span class="nav-num">⌂</span><span class="nav-label">Dashboard</span><span class="nav-badge alert">3</span></div>
+    <div class="nav-item" data-target="mssessions"><span class="nav-num">◆</span><span class="nav-label">Mindsweeper sessions</span><span class="nav-badge new" id="ms-nav-badge" style="display:none"></span></div>
     <div class="nav-item" data-target="trajectory"><span class="nav-num">↗</span><span class="nav-label">Progress trajectory</span></div>
     <div class="nav-item" data-target="intervention"><span class="nav-num">▤</span><span class="nav-label">Intervention tracker</span><span class="nav-badge new">P1</span></div>
   </div>
@@ -417,6 +418,48 @@ details code { font-family: 'JetBrains Mono', monospace; font-size: 11px; backgr
 </nav>
 
 <main class="content">
+
+<!-- ===== Mindsweeper longitudinal sessions (live from agent) ===== -->
+<section id="mssessions" class="section">
+  <div class="section-header">
+    <div class="section-title-block">
+      <div class="section-eyebrow">LONGITUDINAL · MINDSWEEPER ASSESSMENT</div>
+      <h1 id="ms-title">Mindsweeper sessions</h1>
+      <p class="section-subtitle" id="ms-subtitle">Every Mindsweeper assessment for this student, in order — with the M³ trajectory (Motivation · Metacognition · Resilient disposition) and how their knowledge gaps change over time.</p>
+    </div>
+    <div class="section-actions">
+      <select id="ms-student-select" class="btn btn-secondary" style="cursor:pointer"></select>
+      <a href="./" class="btn btn-primary" id="ms-start-session" style="text-decoration:none;">+ Start new session</a>
+    </div>
+  </div>
+
+  <div id="ms-empty" style="display:none; padding:40px 24px; text-align:center; color:var(--ink-secondary);">
+    <div style="font-size:32px; margin-bottom:10px;">◆</div>
+    <div style="font-size:15px; font-weight:600; color:var(--ink); margin-bottom:6px;">No Mindsweeper sessions yet</div>
+    <p style="font-size:13px; max-width:460px; margin:0 auto 16px; line-height:1.6;">When a student completes a Mindsweeper assessment on this site, it appears here automatically and builds into a development record across sessions. Sessions are stored in this browser, and show up when the agent and this Console are served from the same website.</p>
+    <p style="font-size:12.5px; max-width:460px; margin:0 auto; line-height:1.6; color:var(--ink-tertiary);">The other tabs show a fully worked example student so you can explore the console before any live sessions exist.</p>
+  </div>
+
+  <div id="ms-content" style="display:none;">
+    <div class="panel" style="margin-bottom:18px;">
+      <div class="panel-header"><h2 class="panel-title">M³ trajectory across sessions</h2><span class="panel-meta" id="ms-session-count"></span></div>
+      <div style="position:relative; height:300px; padding:12px 4px 4px;"><canvas id="ms-m3-chart"></canvas></div>
+      <div style="font-size:11.5px; color:var(--ink-tertiary); line-height:1.6; padding:0 4px;">
+        Each line is one M³ construct, normalised to 0–100 so they sit on one axis. Motivation = RAI (−10…10) rescaled; Metacognition = mean of KoC &amp; RoC (1…5) rescaled; Resilient disposition = CYRM-R Personal sum (10…50) rescaled.
+      </div>
+    </div>
+
+    <div class="panel" style="margin-bottom:18px;">
+      <div class="panel-header"><h2 class="panel-title">Knowledge gaps — closing, persisting, new</h2></div>
+      <div id="ms-gaps"></div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-header"><h2 class="panel-title">Session timeline</h2><a id="ms-student-view-link" href="./Mindsweeper_Student.html" target="_blank" rel="noopener" class="panel-link" style="text-decoration:none;">Open student view →</a></div>
+      <div id="ms-timeline"></div>
+    </div>
+  </div>
+</section>
 
 <!-- ===== Dashboard ===== -->
 <section id="dashboard" class="section active">
@@ -1202,6 +1245,7 @@ function showSection(id) {
   sections.forEach(s => s.classList.toggle('active', s.id === id));
   window.scrollTo({ top: 0, behavior: 'smooth' });
   if (id === 'trajectory') setTimeout(renderTraj, 50);
+  if (id === 'mssessions') setTimeout(() => { if (window.msRenderChart) window.msRenderChart(); }, 50);
 }
 navItems.forEach(item => {
   item.addEventListener('click', () => showSection(item.dataset.target));
@@ -1286,6 +1330,170 @@ function renderTopics(filter) {
   });
 }
 renderTopics();
+
+// ═══════════════════════════════════════════════════════════════════════════
+// MINDSWEEPER LONGITUDINAL BRIDGE
+// Reads the per-student session history written by the Mindsweeper agent (same
+// localStorage contract, same origin) and renders the cross-session view.
+// Purely additive: the rich example dashboard remains the default view.
+// ═══════════════════════════════════════════════════════════════════════════
+(function () {
+  const MS_KEYS = { index: "mindsweeper:index", student: (id) => `mindsweeper:student:${id}` };
+  const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const read = (k) => { try { return JSON.parse(localStorage.getItem(k) || "null"); } catch { return null; } };
+
+  const normRAI = (v) => v == null ? null : Math.round(((v + 10) / 20) * 100);
+  const normMeta = (koc, roc) => { const vs = [koc, roc].filter(x => x != null); if (!vs.length) return null; return Math.round((((vs.reduce((a,b)=>a+b,0)/vs.length) - 1) / 4) * 100); };
+  const normRes = (sum) => sum == null ? null : Math.round(((sum - 10) / 40) * 100);
+
+  let chart = null, current = null;
+  const getIndex = () => read(MS_KEYS.index) || [];
+
+  function pickInitialStudentId() {
+    const m = (location.hash || "").match(/student=([^&]+)/);
+    if (m) return decodeURIComponent(m[1]);
+    const idx = getIndex();
+    if (!idx.length) return null;
+    return idx.slice().sort((a,b) => String(b.lastUpdated).localeCompare(String(a.lastUpdated)))[0].studentId;
+  }
+  function loadStudent(id) { current = read(MS_KEYS.student(id)); render(); }
+  function fmtDate(iso) { try { return new Date(iso).toLocaleDateString(undefined, { day:'numeric', month:'short', year:'numeric' }); } catch { return iso; } }
+
+  function renderSelect() {
+    const sel = document.getElementById('ms-student-select');
+    const idx = getIndex();
+    if (!sel) return;
+    if (!idx.length) { sel.style.display = 'none'; return; }
+    sel.style.display = '';
+    sel.innerHTML = idx.slice().sort((a,b)=>String(b.lastUpdated).localeCompare(String(a.lastUpdated)))
+      .map(e => `<option value="${esc(e.studentId)}"${current && e.studentId===current.studentId?' selected':''}>${esc(e.name)}${e.grade?' · '+esc(e.grade):''} (${e.sessionCount})</option>`).join('');
+    sel.onchange = () => loadStudent(sel.value);
+  }
+
+  function classifyGaps(sessions) {
+    if (!sessions.length) return { closed: [], persisting: [], appeared: [] };
+    const latest = sessions[sessions.length - 1];
+    const prev = sessions.length > 1 ? sessions[sessions.length - 2] : { topic_gaps: [] };
+    const norm = (g) => String(g).trim().toLowerCase();
+    const latestSet = new Set((latest.topic_gaps||[]).map(norm));
+    const prevSet = new Set((prev.topic_gaps||[]).map(norm));
+    return {
+      closed: (prev.topic_gaps||[]).filter(g => !latestSet.has(norm(g))),
+      appeared: (latest.topic_gaps||[]).filter(g => !prevSet.has(norm(g))),
+      persisting: (latest.topic_gaps||[]).filter(g => prevSet.has(norm(g))),
+    };
+  }
+
+  function renderGaps() {
+    const el = document.getElementById('ms-gaps');
+    if (!el || !current) return;
+    const s = current.sessions;
+    const { closed, persisting, appeared } = classifyGaps(s);
+    const single = s.length <= 1;
+    const block = (title, items, color, bg, icon, emptyMsg) => `
+      <div style="margin-bottom:14px;">
+        <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.6px; color:${color}; margin-bottom:6px;">${icon} ${esc(title)} (${items.length})</div>
+        ${items.length ? items.map(g => `<div style="display:flex; gap:9px; padding:7px 10px; background:${bg}; border-radius:7px; margin-bottom:4px; font-size:13px; color:var(--ink); align-items:flex-start;"><span style="color:${color}; font-weight:700;">${icon}</span><span>${esc(g)}</span></div>`).join('') : `<div style="font-size:12px; color:var(--ink-tertiary); font-style:italic; padding:2px 0;">${esc(emptyMsg)}</div>`}
+      </div>`;
+    el.innerHTML =
+      (single ? `<div style="font-size:12.5px; color:var(--ink-secondary); margin-bottom:12px; padding:8px 12px; background:var(--blue-bg); border:1px solid var(--blue-border); border-radius:7px;">Only one session so far — gaps below are the current picture. After the next session, this panel shows which gaps closed, which persist, and which are new.</div>` : '') +
+      block('Closed since last session', closed, '#166534', 'rgba(22,101,52,0.07)', '✓', 'None closed yet') +
+      block('Still persisting', persisting, '#b45309', 'rgba(180,83,9,0.07)', '→', 'None persisting') +
+      block(single ? 'Current gaps' : 'Newly appeared', appeared, '#b91c1c', 'rgba(185,28,28,0.06)', single ? '•' : '＋', single ? 'None recorded' : 'None new');
+  }
+
+  function renderTimeline() {
+    const el = document.getElementById('ms-timeline');
+    if (!el || !current) return;
+    const s = current.sessions.slice().reverse();
+    el.innerHTML = s.map((rec, i) => {
+      const n = current.sessions.length - i;
+      const m3 = rec.m3 || {};
+      const chips = [];
+      if (m3.motivation_band) chips.push(`Motivation: ${esc(m3.motivation_band)}${m3.motivation_rai!=null?` (RAI ${m3.motivation_rai})`:''}`);
+      if (m3.metacognition_band) chips.push(`Metacognition: ${esc(m3.metacognition_band)}`);
+      if (m3.resilience_band) chips.push(`Resilience: ${esc(m3.resilience_band)}${m3.resilience_sum!=null?` (${m3.resilience_sum}/50)`:''}`);
+      if (m3.mindset) chips.push(`Mindset: ${esc(String(m3.mindset).replace(/_/g,' '))}`);
+      return `
+      <div style="border-left:2px solid var(--border); padding:0 0 18px 18px; position:relative;">
+        <div style="position:absolute; left:-7px; top:2px; width:12px; height:12px; border-radius:50%; background:#166534; border:2px solid var(--bg);"></div>
+        <div style="display:flex; justify-content:space-between; align-items:baseline; gap:10px; flex-wrap:wrap;">
+          <div style="font-weight:700; font-size:14px; color:var(--ink);">Session ${n}${i===0?' · latest':''}</div>
+          <div style="font-size:11.5px; color:var(--ink-tertiary); font-family:'JetBrains Mono',monospace;">${esc(fmtDate(rec.timestamp))} · ${esc(rec.mode||'')}</div>
+        </div>
+        ${rec.overall_level?`<div style="font-size:12.5px; color:var(--ink-secondary); margin-top:3px;">Knowledge level: <strong>${esc(rec.overall_level)}</strong> · ${(rec.topic_strengths||[]).length} strengths · ${(rec.topic_gaps||[]).length} gaps</div>`:''}
+        ${chips.length?`<div style="display:flex; flex-wrap:wrap; gap:6px; margin-top:8px;">${chips.map(c=>`<span style="font-size:11px; padding:3px 9px; border-radius:10px; background:var(--surface-2,#f5f4f0); color:var(--ink-secondary);">${c}</span>`).join('')}</div>`:''}
+        ${rec.overall_verdict?`<div style="font-size:12px; color:var(--ink-secondary); line-height:1.6; margin-top:8px; padding:8px 11px; background:rgba(22,101,52,0.05); border-radius:7px;">${esc(rec.overall_verdict)}</div>`:''}
+      </div>`;
+    }).join('');
+  }
+
+  window.msRenderChart = function () {
+    if (!current) return;
+    const ctx = document.getElementById('ms-m3-chart');
+    if (!ctx) return;
+    if (chart) { chart.destroy(); chart = null; }
+    const sessions = current.sessions;
+    const labels = sessions.map((s, i) => `S${i+1}`);
+    const mk = (data, label, color) => ({ label, data, borderColor: color, backgroundColor: color+'22', borderWidth: 2, tension: 0.25, pointRadius: 4, pointHoverRadius: 6, pointBackgroundColor: color, spanGaps: true, fill: false });
+    chart = new Chart(ctx, {
+      type: 'line',
+      data: { labels, datasets: [
+        mk(sessions.map(s => normRAI(s.m3?.motivation_rai)), 'Motivation', '#7c3aed'),
+        mk(sessions.map(s => normMeta(s.m3?.metacognition_koc, s.m3?.metacognition_roc)), 'Metacognition', '#0369a1'),
+        mk(sessions.map(s => normRes(s.m3?.resilience_sum)), 'Resilient disposition', '#166534'),
+      ]},
+      options: { responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false },
+        plugins: { legend: { position: 'bottom', labels: { font: { family: 'Inter', size: 12 }, color: '#57534e', usePointStyle: true } } },
+        scales: { y: { min: 0, max: 100, ticks: { font: { family: 'JetBrains Mono', size: 10 }, color: '#a8a29e' }, grid: { color: '#e7e5e0' }, title: { display: true, text: 'Normalised 0–100', font: { family:'Inter', size: 10 }, color:'#a8a29e' } }, x: { ticks: { font: { family: 'JetBrains Mono', size: 10 }, color: '#a8a29e' }, grid: { display: false } } } },
+    });
+  };
+
+  function render() {
+    const empty = document.getElementById('ms-empty');
+    const content = document.getElementById('ms-content');
+    const idx = getIndex();
+    const badge = document.getElementById('ms-nav-badge');
+    if (!idx.length || !current || !current.sessions || !current.sessions.length) {
+      if (empty) empty.style.display = 'block';
+      if (content) content.style.display = 'none';
+      if (badge) badge.style.display = 'none';
+      renderSelect();
+      return;
+    }
+    if (empty) empty.style.display = 'none';
+    if (content) content.style.display = 'block';
+    const title = document.getElementById('ms-title');
+    const sub = document.getElementById('ms-subtitle');
+    const count = document.getElementById('ms-session-count');
+    if (title) title.textContent = `${current.name} — Mindsweeper sessions`;
+    if (sub) sub.textContent = `${current.sessions.length} session${current.sessions.length===1?'':'s'}${current.grade?' · '+current.grade:''}. M³ trajectory and how knowledge gaps change across sessions.`;
+    if (count) count.textContent = `${current.sessions.length} session${current.sessions.length===1?'':'s'}`;
+    if (badge) { badge.style.display = ''; badge.textContent = current.sessions.length; }
+    renderSelect();
+    renderGaps();
+    renderTimeline();
+    const svLink = document.getElementById('ms-student-view-link');
+    if (svLink && current) svLink.href = `./Mindsweeper_Student.html#student=${encodeURIComponent(current.studentId)}`;
+    if (document.getElementById('mssessions').classList.contains('active')) window.msRenderChart();
+  }
+
+  function init() {
+    const id = pickInitialStudentId();
+    if (id) current = read(MS_KEYS.student(id));
+    render();
+    // Deep-link jumps to the Mindsweeper view; otherwise the dashboard stays default.
+    if ((location.hash||'').includes('student=') && typeof showSection === 'function') showSection('mssessions');
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+
+  window.addEventListener('hashchange', () => {
+    const id = pickInitialStudentId();
+    if (id) { current = read(MS_KEYS.student(id)); if (typeof showSection==='function') showSection('mssessions'); render(); }
+  });
+})();
+
 document.querySelectorAll('[data-filter]').forEach(c => {
   c.addEventListener('click', () => {
     document.querySelectorAll('[data-filter]').forEach(x => x.classList.remove('active'));
