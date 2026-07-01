@@ -1,0 +1,1657 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mindsweeper · Teacher Console · Yu Xiao Ting</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@400;500;600;700;900&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --bg-app: #fbfaf6; --bg-content: #f6f4ef; --bg-sidebar: #f1efe8;
+  --surface: #fffef9; --surface-alt: #f0ede5;
+  --ink: #1c1917; --ink-secondary: #57534e; --ink-muted: #a8a29e; --ink-faint: #d6d3cd;
+  --border: #e7e5e0; --border-strong: #d4d1ca;
+  --red: #b91c1c; --red-bg: #fef2f2; --red-border: #fecaca; --red-deep: #7f1d1d;
+  --amber: #92400e; --amber-bg: #fffbeb; --amber-border: #fde68a;
+  --green: #166534; --green-bg: #f0fdf4; --green-border: #bbf7d0;
+  --blue: #1e40af; --blue-bg: #eff6ff; --blue-border: #bfdbfe;
+  --purple: #6b21a8; --purple-bg: #faf5ff; --purple-border: #e9d5ff;
+  --teal: #115e59; --teal-bg: #f0fdfa; --teal-border: #99f6e4;
+}
+html, body { height: 100%; }
+body { font-family: 'Inter', -apple-system, sans-serif; font-size: 14px; line-height: 1.6; color: var(--ink); background: var(--bg-app); -webkit-font-smoothing: antialiased; }
+button, input, select, textarea { font-family: inherit; }
+
+/* App shell */
+.app { display: grid; grid-template-rows: 60px 1fr; min-height: 100vh; }
+.topbar { display: grid; grid-template-columns: 280px 1fr auto; align-items: center; gap: 16px; padding: 0 24px; background: var(--surface); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 50; }
+.brand { display: flex; align-items: center; gap: 10px; font-family: 'Source Serif 4', serif; font-size: 18px; font-weight: 700; letter-spacing: -0.01em; }
+.brand-mark { width: 28px; height: 28px; border-radius: 6px; background: var(--ink); color: var(--surface); display: flex; align-items: center; justify-content: center; font-family: 'Source Serif 4', serif; font-size: 14px; font-weight: 900; }
+.brand small { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--ink-muted); letter-spacing: 1.5px; text-transform: uppercase; font-weight: 400; margin-left: 6px; }
+.student-picker { display: flex; align-items: center; gap: 10px; padding: 6px 10px 6px 6px; background: var(--bg-content); border: 1px solid var(--border); border-radius: 8px; cursor: pointer; max-width: 380px; transition: border-color 0.1s; }
+.student-picker:hover { border-color: var(--border-strong); }
+.student-avatar { width: 28px; height: 28px; border-radius: 50%; background: linear-gradient(135deg, #94a3b8, #64748b); color: white; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; flex-shrink: 0; }
+.student-picker-info { line-height: 1.3; }
+.student-picker-name { font-weight: 600; font-size: 13px; }
+.student-picker-meta { font-size: 11px; color: var(--ink-muted); font-family: 'JetBrains Mono', monospace; }
+.student-picker-chevron { color: var(--ink-muted); margin-left: 4px; font-size: 10px; }
+.topbar-actions { display: flex; align-items: center; gap: 10px; }
+.topbar-search { width: 240px; padding: 7px 12px; background: var(--bg-content); border: 1px solid var(--border); border-radius: 8px; font-size: 13px; color: var(--ink); }
+.topbar-search:focus { outline: none; border-color: var(--ink); background: var(--surface); }
+.icon-btn { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 8px; background: transparent; border: 1px solid transparent; cursor: pointer; color: var(--ink-secondary); position: relative; }
+.icon-btn:hover { background: var(--bg-content); border-color: var(--border); }
+.icon-btn .dot { position: absolute; top: 6px; right: 7px; width: 7px; height: 7px; background: var(--red); border-radius: 50%; border: 1.5px solid var(--surface); }
+.user-avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #ddd0a8, #b29960); color: white; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; cursor: pointer; }
+
+/* Sidebar */
+.app-body { display: grid; grid-template-columns: 260px 1fr; min-height: 0; }
+.sidebar { background: var(--bg-sidebar); border-right: 1px solid var(--border); padding: 18px 10px; overflow-y: auto; max-height: calc(100vh - 60px); position: sticky; top: 60px; }
+.nav-group { margin-bottom: 22px; }
+.nav-group-header { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--ink-muted); font-weight: 600; padding: 0 10px 8px; }
+.nav-item { display: flex; align-items: center; gap: 10px; padding: 7px 10px; border-radius: 6px; cursor: pointer; font-size: 13px; color: var(--ink-secondary); transition: background 0.1s, color 0.1s; user-select: none; }
+.nav-item:hover { background: rgba(0,0,0,0.04); color: var(--ink); }
+.nav-item.active { background: var(--ink); color: var(--surface); font-weight: 500; }
+.nav-item.active .nav-num { color: var(--surface); opacity: 0.6; }
+.nav-num { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--ink-muted); flex-shrink: 0; min-width: 18px; }
+.nav-label { flex: 1; }
+.nav-badge { font-size: 10px; padding: 1px 6px; border-radius: 4px; font-weight: 600; }
+.nav-badge.alert { background: var(--red-bg); color: var(--red); }
+.nav-badge.warn { background: var(--amber-bg); color: var(--amber); }
+.nav-badge.new { background: var(--blue-bg); color: var(--blue); }
+.nav-item.active .nav-badge { background: rgba(255,255,255,0.18); color: rgba(255,255,255,0.95); }
+
+/* Content + section common */
+.content { padding: 28px 36px 60px; background: var(--bg-content); overflow-x: auto; min-width: 0; }
+.section { display: none; max-width: 1080px; }
+.section.active { display: block; animation: fadeIn 0.2s ease-out; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+.section-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 24px; margin-bottom: 28px; padding-bottom: 20px; border-bottom: 1px solid var(--border); }
+.section-title-block { flex: 1; min-width: 0; }
+.section-eyebrow { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--ink-muted); margin-bottom: 6px; font-weight: 600; }
+h1 { font-family: 'Source Serif 4', serif; font-size: 28px; font-weight: 700; line-height: 1.2; letter-spacing: -0.01em; }
+h2 { font-family: 'Source Serif 4', serif; font-size: 20px; font-weight: 600; line-height: 1.3; margin-bottom: 8px; }
+h3 { font-family: 'Source Serif 4', serif; font-size: 16px; font-weight: 600; line-height: 1.4; }
+.section-subtitle { margin-top: 6px; font-size: 14px; color: var(--ink-secondary); max-width: 70ch; line-height: 1.7; }
+.section-actions { display: flex; gap: 8px; flex-shrink: 0; align-items: center; }
+.btn { display: inline-flex; align-items: center; gap: 6px; padding: 7px 12px; border-radius: 6px; font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.1s; border: 1px solid transparent; white-space: nowrap; }
+.btn-primary { background: var(--ink); color: var(--surface); }
+.btn-primary:hover { background: #0c0a09; }
+.btn-secondary { background: var(--surface); color: var(--ink); border-color: var(--border-strong); }
+.btn-secondary:hover { background: var(--surface-alt); }
+.btn-ghost { background: transparent; color: var(--ink-secondary); }
+.btn-ghost:hover { background: var(--surface-alt); color: var(--ink); }
+.verify-strip { background: var(--green-bg); border: 1px solid var(--green-border); border-radius: 8px; padding: 10px 14px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; font-size: 12px; color: var(--ink-secondary); }
+.verify-strip .green-dot { width: 8px; height: 8px; background: var(--green); border-radius: 50%; flex-shrink: 0; }
+.verify-strip strong { color: var(--green); font-family: 'Source Serif 4', serif; font-size: 13px; }
+
+/* Dashboard */
+.stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 24px; }
+.stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px 18px; }
+.stat-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--ink-muted); margin-bottom: 8px; font-weight: 600; }
+.stat-value { font-family: 'Source Serif 4', serif; font-size: 28px; font-weight: 700; line-height: 1.1; }
+.stat-value.critical { color: var(--red); }
+.stat-value.warning { color: var(--amber); }
+.stat-value.ok { color: var(--green); }
+.stat-delta { font-size: 12px; color: var(--ink-muted); margin-top: 6px; font-family: 'JetBrains Mono', monospace; }
+.stat-delta.up { color: var(--green); }
+.stat-delta.down { color: var(--red); }
+.panel-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.panel { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 20px 22px; }
+.panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
+.panel-title { font-family: 'Source Serif 4', serif; font-weight: 600; font-size: 15px; }
+.panel-link { font-size: 11px; color: var(--ink-secondary); text-decoration: none; font-family: 'JetBrains Mono', monospace; cursor: pointer; }
+.panel-link:hover { color: var(--ink); }
+.focus-card { background: linear-gradient(135deg, #fef9f3 0%, #fffbeb 100%); border: 1px solid var(--amber-border); border-radius: 10px; padding: 20px 22px; margin-bottom: 18px; }
+.focus-eyebrow { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--amber); margin-bottom: 6px; font-weight: 600; }
+.focus-title { font-family: 'Source Serif 4', serif; font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+.focus-desc { font-size: 13px; color: var(--ink-secondary); line-height: 1.7; margin-bottom: 14px; }
+.focus-strats { display: flex; flex-wrap: wrap; gap: 6px; }
+.focus-strat-chip { font-size: 11px; padding: 3px 9px; background: rgba(255,255,255,0.7); border: 1px solid var(--amber-border); border-radius: 999px; color: var(--amber); font-weight: 500; }
+.activity-list { list-style: none; }
+.activity-item { display: grid; grid-template-columns: 80px 1fr auto; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+.activity-item:last-child { border-bottom: none; }
+.activity-date { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--ink-muted); }
+.activity-desc { color: var(--ink); line-height: 1.5; }
+.activity-tag { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--ink-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+
+/* Trajectory */
+.traj-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 22px 24px; }
+.traj-canvas-wrap { position: relative; height: 320px; margin: 16px 0; }
+.traj-events { display: flex; gap: 16px; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border); flex-wrap: wrap; }
+.traj-event { flex: 1; min-width: 180px; font-size: 12px; color: var(--ink-secondary); line-height: 1.6; }
+.traj-event .date { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--ink-muted); display: block; margin-bottom: 2px; text-transform: uppercase; letter-spacing: 0.5px; }
+.traj-event .label { font-weight: 600; color: var(--ink); display: block; margin-bottom: 2px; }
+
+/* Tables */
+.data-table { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+.table-toolbar { display: flex; gap: 8px; padding: 10px 14px; border-bottom: 1px solid var(--border); background: var(--surface-alt); align-items: center; flex-wrap: wrap; }
+.filter-chip { font-size: 11px; padding: 4px 10px; background: var(--surface); border: 1px solid var(--border); border-radius: 999px; cursor: pointer; color: var(--ink-secondary); transition: all 0.1s; }
+.filter-chip:hover { border-color: var(--border-strong); }
+.filter-chip.active { background: var(--ink); color: var(--surface); border-color: var(--ink); }
+.filter-spacer { flex: 1; }
+.filter-count { font-size: 11px; color: var(--ink-muted); font-family: 'JetBrains Mono', monospace; }
+.topic-row { display: grid; grid-template-columns: 1fr 100px 70px 100px; align-items: center; padding: 12px 16px; border-bottom: 1px solid var(--border); gap: 14px; transition: background 0.1s; cursor: pointer; }
+.topic-row:last-child { border-bottom: none; }
+.topic-row:hover { background: var(--bg-content); }
+.topic-row.expanded { background: var(--bg-content); }
+.topic-name { font-weight: 500; font-size: 13px; }
+.topic-code { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--ink-muted); margin-top: 2px; }
+.topic-bar-wrap { background: var(--surface-alt); height: 6px; border-radius: 3px; overflow: hidden; }
+.topic-bar { height: 100%; border-radius: 3px; }
+.topic-bar.critical { background: var(--red); }
+.topic-bar.warning { background: #d97706; }
+.topic-bar.ok { background: var(--green); }
+.topic-score { font-family: 'JetBrains Mono', monospace; font-weight: 600; text-align: right; font-size: 13px; }
+.topic-score.critical { color: var(--red); }
+.topic-score.warning { color: #d97706; }
+.topic-score.ok { color: var(--green); }
+.badge { display: inline-block; font-size: 10px; padding: 2px 8px; border-radius: 4px; font-weight: 600; text-align: center; letter-spacing: 0.3px; }
+.badge.critical { background: var(--red-bg); color: var(--red); border: 1px solid var(--red-border); }
+.badge.warning { background: var(--amber-bg); color: var(--amber); border: 1px solid var(--amber-border); }
+.badge.ok { background: var(--green-bg); color: var(--green); border: 1px solid var(--green-border); }
+.topic-expand { grid-column: 1/-1; padding: 14px 0 6px; border-top: 1px dashed var(--border); margin-top: 12px; font-size: 12px; color: var(--ink-secondary); line-height: 1.6; display: none; }
+.topic-row.expanded .topic-expand { display: block; }
+
+/* Gap table */
+.gap-table-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+.gap-summary { display: flex; align-items: center; gap: 24px; padding: 18px 22px; background: linear-gradient(135deg, #fef9f3 0%, #fffbeb 100%); border-bottom: 1px solid var(--border); }
+.gap-bignum { font-family: 'Source Serif 4', serif; font-size: 44px; font-weight: 700; color: var(--amber); line-height: 1; }
+.gap-bignum-label { font-size: 11px; color: var(--ink-muted); font-family: 'JetBrains Mono', monospace; text-transform: uppercase; letter-spacing: 1.5px; margin-top: 4px; }
+.gap-summary-text { flex: 1; font-size: 13px; color: var(--ink-secondary); line-height: 1.7; }
+table.gap-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+table.gap-table th, table.gap-table td { padding: 10px 14px; border-bottom: 1px solid var(--border); text-align: left; vertical-align: top; }
+table.gap-table th { background: var(--surface-alt); font-weight: 600; font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: var(--ink-muted); }
+.qid { font-family: 'JetBrains Mono', monospace; font-weight: 600; }
+.gap-cat { display: inline-block; font-size: 10px; padding: 2px 7px; border-radius: 4px; font-weight: 600; white-space: nowrap; }
+.gap-cat.arith { background: var(--amber-bg); color: var(--amber); }
+.gap-cat.work { background: var(--blue-bg); color: var(--blue); }
+.gap-cat.dual { background: var(--purple-bg); color: var(--purple); }
+.gap-cat.notation { background: var(--teal-bg); color: var(--teal); }
+
+/* Knowledge tree */
+.kg-toolbar { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; }
+.kg-legend { display: flex; gap: 6px; flex-wrap: wrap; }
+.kg-legend-chip { font-size: 10px; padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; border: 1px solid; letter-spacing: 0.5px; }
+.kg-legend-chip.c-r { background: var(--red-bg); color: var(--red); border-color: var(--red-border); }
+.kg-legend-chip.c-a { background: var(--amber-bg); color: var(--amber); border-color: var(--amber-border); }
+.kg-legend-chip.c-g { background: var(--green-bg); color: var(--green); border-color: var(--green-border); }
+.kg-legend-chip.c-n { background: var(--surface); color: var(--ink-muted); border-color: var(--border); border-style: dashed; }
+.kg-legend-chip.c-k { background: var(--red-deep); color: white; border-color: var(--red-deep); }
+.kg-level { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; margin-bottom: 10px; }
+.kg-level-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.kg-grade-tag { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 600; padding: 3px 8px; background: var(--surface-alt); border-radius: 4px; letter-spacing: 1px; text-transform: uppercase; }
+.kg-level-note { font-size: 11px; color: var(--ink-muted); font-style: italic; }
+.kg-nodes { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+@media (max-width: 900px) { .kg-nodes { grid-template-columns: repeat(2, 1fr); } }
+.kg-node { padding: 9px 11px; border-radius: 6px; cursor: pointer; border: 1px solid var(--border); background: var(--surface); transition: transform 0.1s, border-color 0.1s; }
+.kg-node:hover { transform: translateY(-1px); }
+.kg-node.active { outline: 2px solid var(--ink); outline-offset: -2px; }
+.kg-node .code { font-family: 'JetBrains Mono', monospace; font-size: 10.5px; color: var(--ink-muted); margin-bottom: 3px; display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+.kg-node .title { font-size: 12px; line-height: 1.35; }
+.kg-node .score { font-family: 'JetBrains Mono', monospace; font-size: 10.5px; margin-top: 3px; opacity: 0.7; }
+.kg-node.s-critical { background: var(--red-bg); border-color: var(--red-border); }
+.kg-node.s-critical .code, .kg-node.s-critical .title { color: var(--red-deep); }
+.kg-node.s-warning { background: var(--amber-bg); border-color: var(--amber-border); }
+.kg-node.s-warning .code, .kg-node.s-warning .title { color: var(--amber); }
+.kg-node.s-ok { background: var(--green-bg); border-color: var(--green-border); }
+.kg-node.s-ok .code, .kg-node.s-ok .title { color: var(--green); }
+.kg-node.s-prereq { background: var(--surface); border-style: dashed; }
+.kg-node.s-prereq .code, .kg-node.s-prereq .title { color: var(--ink-muted); }
+.kg-node.s-bottleneck { background: var(--red-bg); border: 1.5px solid var(--red-deep); }
+.kg-node.s-bottleneck .code, .kg-node.s-bottleneck .title { color: var(--red-deep); }
+.kg-node.s-bottleneck .title { font-weight: 600; }
+.kg-bot-badge { font-size: 9px; background: var(--red-deep); color: white; padding: 1px 5px; border-radius: 3px; font-weight: 600; font-family: 'JetBrains Mono', monospace; letter-spacing: 0.5px; }
+.kg-node.fan-highlight { background: var(--blue-bg); border: 1px solid var(--blue); outline: 1px solid var(--blue); outline-offset: -2px; }
+.kg-node.fan-highlight .code, .kg-node.fan-highlight .title { color: var(--blue); }
+.kg-detail { background: var(--surface); border: 1px solid var(--border-strong); border-radius: 10px; padding: 18px 22px; margin-top: 14px; min-height: 100px; }
+.kg-detail-empty { color: var(--ink-muted); font-size: 13px; padding: 18px 0; text-align: center; font-style: italic; }
+.kg-detail h4 { font-family: 'Source Serif 4', serif; font-size: 18px; font-weight: 600; margin-bottom: 8px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.kg-meta-line { font-size: 11px; color: var(--ink-muted); margin-bottom: 12px; font-family: 'JetBrains Mono', monospace; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.kg-desc { font-size: 13px; line-height: 1.7; color: var(--ink-secondary); margin-bottom: 12px; font-style: italic; padding-left: 12px; border-left: 3px solid var(--border); }
+.kg-section { margin-top: 14px; }
+.kg-section-label { font-size: 10px; font-weight: 600; color: var(--ink-muted); text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 6px; font-family: 'JetBrains Mono', monospace; }
+.kg-evidence { font-size: 12px; line-height: 1.6; padding: 7px 12px; background: var(--bg-content); border-radius: 6px; margin-bottom: 4px; }
+.kg-evidence .qid { font-weight: 600; margin-right: 8px; font-size: 11px; }
+.kg-lc { font-size: 12px; line-height: 1.7; padding: 2px 0; color: var(--ink-secondary); }
+.kg-lc-tag { display: inline-block; background: var(--purple-bg); color: var(--purple); padding: 0 5px; border-radius: 3px; font-size: 9.5px; font-weight: 600; margin-right: 6px; font-family: 'JetBrains Mono', monospace; letter-spacing: 0.5px; }
+.kg-fanout { display: flex; gap: 5px; flex-wrap: wrap; }
+.kg-fan-chip { font-size: 11px; padding: 3px 9px; background: var(--blue-bg); color: var(--blue); border-radius: 4px; cursor: pointer; font-family: 'JetBrains Mono', monospace; border: 1px solid var(--blue-border); }
+.kg-fan-chip:hover { background: var(--blue); color: white; }
+.kg-live { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; padding: 1px 7px; background: var(--green-bg); color: var(--green); border-radius: 3px; font-weight: 600; font-family: 'JetBrains Mono', monospace; }
+.kg-live .dot { width: 6px; height: 6px; background: var(--green); border-radius: 50%; }
+.kg-actions { display: flex; gap: 6px; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border); flex-wrap: wrap; }
+.kg-note { font-size: 12px; line-height: 1.6; color: var(--ink-secondary); font-style: italic; }
+
+/* Bottleneck card */
+.bottleneck-hero { background: linear-gradient(135deg, #fef2f2 0%, #fff7ed 100%); border: 1px solid var(--red-border); border-radius: 12px; padding: 24px 26px; margin-bottom: 18px; }
+.bottleneck-hero-title { font-family: 'Source Serif 4', serif; font-size: 22px; font-weight: 700; color: var(--red-deep); margin-bottom: 4px; }
+.bottleneck-hero-code { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--red); letter-spacing: 1px; }
+.bottleneck-body { font-size: 13px; color: var(--ink-secondary); line-height: 1.75; margin-top: 14px; }
+.bottleneck-body strong { color: var(--ink); }
+.fanout-visual { margin-top: 18px; padding: 16px; background: rgba(255,255,255,0.5); border-radius: 8px; border: 1px dashed var(--red-border); }
+.fanout-visual-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--red); font-weight: 600; margin-bottom: 10px; }
+.fanout-tree { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.fanout-tree .root { grid-column: 1 / -1; background: var(--red-deep); color: white; padding: 10px 14px; border-radius: 6px; text-align: center; font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 600; }
+.fanout-tree .arrow { grid-column: 1 / -1; text-align: center; color: var(--red); font-size: 16px; line-height: 1; }
+.fanout-tree .leaf { background: var(--surface); border: 1px solid var(--red-border); padding: 8px 12px; border-radius: 6px; font-size: 12px; }
+.fanout-tree .leaf .leaf-code { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--red); margin-bottom: 2px; font-weight: 600; }
+.fanout-tree .leaf .leaf-text { color: var(--ink-secondary); font-size: 11px; }
+
+/* Factor + character */
+.factor-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.factor-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 18px 20px; }
+.factor-card.lead { grid-column: 1 / -1; background: var(--red-bg); border-color: var(--red-border); }
+.factor-icon { font-size: 24px; margin-bottom: 6px; }
+.factor-name { font-family: 'Source Serif 4', serif; font-weight: 700; font-size: 16px; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.factor-cat { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: var(--ink-muted); font-weight: 600; margin-bottom: 12px; }
+.factor-desc { font-size: 13px; color: var(--ink-secondary); line-height: 1.7; margin-bottom: 12px; }
+.trainable { font-size: 10px; padding: 2px 8px; border-radius: 4px; font-weight: 600; letter-spacing: 0.3px; }
+.trainable.high { background: var(--green-bg); color: var(--green); border: 1px solid var(--green-border); }
+.trainable.med { background: var(--amber-bg); color: var(--amber); border: 1px solid var(--amber-border); }
+.factor-impact { font-size: 11px; color: var(--ink-muted); }
+.impact-chip { display: inline-block; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 2px 6px; background: var(--surface-alt); border-radius: 3px; margin-right: 4px; margin-bottom: 4px; color: var(--ink); }
+.char-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.char-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px 18px; }
+.char-card h4 { font-family: 'Source Serif 4', serif; font-size: 14px; font-weight: 600; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.char-rating { font-size: 10px; padding: 2px 8px; border-radius: 4px; font-weight: 600; }
+.char-rating.high { background: var(--green-bg); color: var(--green); }
+.char-rating.med { background: var(--amber-bg); color: var(--amber); }
+.char-rating.low { background: var(--red-bg); color: var(--red); }
+.char-rating.mixed { background: var(--blue-bg); color: var(--blue); }
+.char-card p { font-size: 12.5px; color: var(--ink-secondary); line-height: 1.65; }
+.char-evidence { font-size: 11px; color: var(--ink-muted); margin-top: 8px; padding-top: 8px; border-top: 1px dashed var(--border); font-style: italic; }
+.calib-table { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; margin-top: 16px; }
+.calib-row { display: grid; grid-template-columns: 2fr 80px 80px 70px 2fr; padding: 10px 14px; border-bottom: 1px solid var(--border); font-size: 12px; gap: 12px; align-items: center; }
+.calib-row.head { background: var(--surface-alt); font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: var(--ink-muted); font-weight: 600; }
+.calib-row:last-child { border-bottom: none; }
+.conf { font-family: 'JetBrains Mono', monospace; font-weight: 600; }
+.gap-val { font-family: 'JetBrains Mono', monospace; font-weight: 700; }
+.gap-val.under { color: var(--green); }
+.gap-val.over { color: var(--red); }
+.gap-val.cal { color: var(--ink-muted); }
+.insight { font-size: 11.5px; color: var(--ink-secondary); }
+
+/* Intervention plan + phase tabs */
+.phase-tabs { display: flex; gap: 4px; margin-bottom: 18px; background: var(--surface-alt); padding: 4px; border-radius: 10px; }
+.phase-tab { flex: 1; padding: 10px 14px; background: transparent; border: none; border-radius: 7px; cursor: pointer; font-size: 12px; color: var(--ink-secondary); text-align: left; }
+.phase-tab:hover { background: rgba(255,255,255,0.5); }
+.phase-tab.active { background: var(--surface); box-shadow: 0 1px 3px rgba(0,0,0,0.06); color: var(--ink); }
+.phase-tab .num { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--ink-muted); font-weight: 600; display: block; margin-bottom: 2px; }
+.phase-tab .name { font-weight: 600; font-size: 12px; display: block; }
+.phase-tab .week { font-size: 10.5px; color: var(--ink-muted); font-family: 'JetBrains Mono', monospace; }
+.phase-panel { display: none; }
+.phase-panel.active { display: block; }
+.phase-hero { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 18px 22px; margin-bottom: 14px; }
+.phase-progress-bar { height: 6px; background: var(--surface-alt); border-radius: 3px; overflow: hidden; margin-top: 12px; border: 1px solid var(--border); }
+.phase-progress-fill { height: 100%; background: var(--green); border-radius: 3px; transition: width 0.3s; }
+.phase-progress-label { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--ink-muted); margin-top: 6px; display: flex; justify-content: space-between; }
+.strategy { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px 18px; margin-bottom: 10px; }
+.strat-head { display: flex; align-items: flex-start; gap: 12px; }
+.strat-check { width: 18px; height: 18px; border: 1.5px solid var(--border-strong); border-radius: 5px; cursor: pointer; flex-shrink: 0; margin-top: 2px; background: var(--surface); transition: all 0.1s; display: flex; align-items: center; justify-content: center; }
+.strat-check.done { background: var(--green); border-color: var(--green); color: white; }
+.strat-check.done::after { content: '✓'; font-size: 12px; }
+.strat-info { flex: 1; }
+.strat-name { font-family: 'Source Serif 4', serif; font-weight: 600; font-size: 15px; margin-bottom: 2px; }
+.strat-tag { display: inline-block; font-size: 9.5px; padding: 1px 7px; background: var(--purple-bg); color: var(--purple); border-radius: 3px; font-weight: 600; font-family: 'JetBrains Mono', monospace; margin-right: 6px; letter-spacing: 0.5px; }
+.strat-targets { font-size: 11px; color: var(--ink-muted); }
+.strat-desc { font-size: 12.5px; color: var(--ink-secondary); line-height: 1.65; margin-top: 4px; }
+.strat-action { margin-top: 10px; padding: 10px 12px; background: var(--bg-content); border-radius: 6px; font-size: 12px; color: var(--ink-secondary); line-height: 1.65; border-left: 3px solid var(--ink); }
+.strat-action strong { color: var(--ink); }
+.strat-research { font-size: 11px; color: var(--ink-muted); margin-top: 8px; font-style: italic; }
+.checkpoint { background: var(--blue-bg); border: 1px solid var(--blue-border); border-radius: 8px; padding: 12px 16px; margin-top: 14px; font-size: 12.5px; color: var(--ink); }
+.checkpoint strong { color: var(--blue); }
+
+/* Methodology */
+.methodology-block { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 22px 24px; }
+details { margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
+details:last-child { border-bottom: none; }
+summary { font-family: 'Source Serif 4', serif; font-weight: 600; font-size: 14px; cursor: pointer; padding: 6px 0; list-style: none; display: flex; align-items: center; gap: 8px; }
+summary::-webkit-details-marker { display: none; }
+summary::before { content: '+'; font-family: 'JetBrains Mono', monospace; color: var(--ink-muted); font-weight: 400; }
+details[open] summary::before { content: '−'; }
+details > div { font-size: 12.5px; color: var(--ink-secondary); line-height: 1.7; padding: 8px 0 4px 18px; }
+details code { font-family: 'JetBrains Mono', monospace; font-size: 11px; background: var(--surface-alt); padding: 1px 5px; border-radius: 3px; }
+
+/* Forms */
+.form-block { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 22px 24px; }
+.field { margin-bottom: 14px; }
+.field label { display: block; font-size: 11px; font-family: 'JetBrains Mono', monospace; color: var(--ink-muted); text-transform: uppercase; letter-spacing: 1px; font-weight: 600; margin-bottom: 5px; }
+.field input, .field select, .field textarea { width: 100%; padding: 9px 12px; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; font-size: 13px; color: var(--ink); }
+.field input:focus, .field select:focus, .field textarea:focus { outline: none; border-color: var(--ink); }
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.item-row { display: grid; grid-template-columns: 80px 140px 80px 1fr auto; gap: 8px; align-items: center; padding: 8px; background: var(--bg-content); border-radius: 6px; margin-bottom: 6px; }
+.item-row input, .item-row select { padding: 6px 8px; border: 1px solid var(--border); border-radius: 5px; background: var(--surface); font-size: 12px; }
+.item-remove { width: 24px; height: 24px; background: transparent; border: none; color: var(--ink-muted); cursor: pointer; border-radius: 4px; }
+.item-remove:hover { background: var(--red-bg); color: var(--red); }
+
+/* Parent preview */
+.parent-preview-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 24px 28px; }
+.parent-preview-meta { display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: var(--blue-bg); border: 1px solid var(--blue-border); border-radius: 8px; margin-bottom: 20px; font-size: 12px; color: var(--ink-secondary); }
+.parent-greeting { font-family: 'Source Serif 4', serif; font-size: 18px; font-weight: 600; margin-bottom: 12px; }
+.parent-block { font-size: 14px; line-height: 1.8; color: var(--ink); margin-bottom: 18px; }
+.parent-callout { background: var(--green-bg); border-left: 3px solid var(--green); padding: 12px 16px; border-radius: 6px; margin: 16px 0; font-size: 13.5px; color: var(--ink); line-height: 1.7; }
+.parent-callout strong { color: var(--green); }
+.parent-next-list { list-style: none; margin: 12px 0; }
+.parent-next-list li { padding: 10px 14px; background: var(--bg-content); border-radius: 6px; margin-bottom: 6px; font-size: 13px; display: flex; align-items: flex-start; gap: 10px; }
+.parent-next-list .num { flex-shrink: 0; width: 22px; height: 22px; background: var(--ink); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; font-family: 'JetBrains Mono', monospace; }
+
+/* Empty state */
+.empty-state { text-align: center; padding: 60px 20px; color: var(--ink-muted); background: var(--surface); border: 1px dashed var(--border-strong); border-radius: 10px; }
+.empty-state-title { font-family: 'Source Serif 4', serif; font-size: 18px; color: var(--ink-secondary); margin-bottom: 8px; }
+.empty-state-desc { font-size: 13px; margin-bottom: 16px; }
+
+@media (max-width: 1100px) {
+  .stat-grid { grid-template-columns: repeat(2, 1fr); }
+  .panel-grid { grid-template-columns: 1fr; }
+  .factor-grid, .char-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 760px) {
+  .app-body { grid-template-columns: 1fr; }
+  .sidebar { display: none; }
+  .content { padding: 20px; }
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+
+<!-- ===== Top bar ===== -->
+<header class="topbar">
+  <div class="brand">
+    <div class="brand-mark">M</div>
+    <span>Mindsweeper</span>
+    <small>Teacher</small>
+  </div>
+  <div class="student-picker" title="Switch student">
+    <div class="student-avatar">XT</div>
+    <div class="student-picker-info">
+      <div class="student-picker-name">Yu Xiao Ting</div>
+      <div class="student-picker-meta">GCSE Foundation · Diagnostic v3 · 7 May 2026</div>
+    </div>
+    <span class="student-picker-chevron">▾</span>
+  </div>
+  <div class="topbar-actions">
+    <input type="search" class="topbar-search" placeholder="Search standards, items, students…">
+    <button class="icon-btn" title="Notifications">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+      <span class="dot"></span>
+    </button>
+    <div class="user-avatar" title="Paula Zheng">PZ</div>
+  </div>
+</header>
+
+<div class="app-body">
+
+<!-- ===== Sidebar ===== -->
+<nav class="sidebar">
+  <div class="nav-group">
+    <div class="nav-group-header">This student</div>
+    <div class="nav-item active" data-target="dashboard"><span class="nav-num">⌂</span><span class="nav-label">Dashboard</span><span class="nav-badge alert">3</span></div>
+    <div class="nav-item" data-target="mssessions"><span class="nav-num">◆</span><span class="nav-label">Mindsweeper sessions</span><span class="nav-badge new" id="ms-nav-badge" style="display:none"></span></div>
+    <div class="nav-item" data-target="trajectory"><span class="nav-num">↗</span><span class="nav-label">Progress trajectory</span></div>
+    <div class="nav-item" data-target="intervention"><span class="nav-num">▤</span><span class="nav-label">Intervention tracker</span><span class="nav-badge new">P1</span></div>
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-header">Diagnostic report v3</div>
+    <div class="nav-item" data-target="cover"><span class="nav-num">—</span><span class="nav-label">Cover</span></div>
+    <div class="nav-item" data-target="sec1"><span class="nav-num">①</span><span class="nav-label">Current performance</span></div>
+    <div class="nav-item" data-target="sec2"><span class="nav-num">②</span><span class="nav-label">Performance vs knowledge</span></div>
+    <div class="nav-item" data-target="sec3"><span class="nav-num">③</span><span class="nav-label">Consolidation gradient</span></div>
+    <div class="nav-item" data-target="sec4"><span class="nav-num">④</span><span class="nav-label">Knowledge tree</span></div>
+    <div class="nav-item" data-target="sec5"><span class="nav-num">⑤</span><span class="nav-label">Bottleneck analysis</span></div>
+    <div class="nav-item" data-target="sec6"><span class="nav-num">⑥</span><span class="nav-label">Intervenable factors</span></div>
+    <div class="nav-item" data-target="sec7"><span class="nav-num">⑦</span><span class="nav-label">Character &amp; calibration</span></div>
+    <div class="nav-item" data-target="sec8"><span class="nav-num">⑧</span><span class="nav-label">Intervention plan</span></div>
+    <div class="nav-item" data-target="sec9"><span class="nav-num">⑨</span><span class="nav-label">Methodology</span></div>
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-header">Tools</div>
+    <div class="nav-item" data-target="tool-newtest"><span class="nav-num">+</span><span class="nav-label">Enter new test</span></div>
+    <div class="nav-item" data-target="tool-verify"><span class="nav-num">⇄</span><span class="nav-label">Standards verification</span></div>
+    <div class="nav-item" data-target="tool-parent"><span class="nav-num">⚇</span><span class="nav-label">Parent-facing preview</span></div>
+  </div>
+</nav>
+
+<main class="content">
+
+<!-- ===== Mindsweeper longitudinal sessions (live from agent) ===== -->
+<section id="mssessions" class="section">
+  <div class="section-header">
+    <div class="section-title-block">
+      <div class="section-eyebrow">LONGITUDINAL · MINDSWEEPER ASSESSMENT</div>
+      <h1 id="ms-title">Mindsweeper sessions</h1>
+      <p class="section-subtitle" id="ms-subtitle">Every Mindsweeper assessment for this student, in order — with the M³ trajectory (Motivation · Metacognition · Resilient disposition) and how their knowledge gaps change over time.</p>
+    </div>
+    <div class="section-actions">
+      <select id="ms-student-select" class="btn btn-secondary" style="cursor:pointer"></select>
+      <a href="./" class="btn btn-primary" id="ms-start-session" style="text-decoration:none;">+ Start new session</a>
+    </div>
+  </div>
+
+  <div id="ms-empty" style="display:none; padding:40px 24px; text-align:center; color:var(--ink-secondary);">
+    <div style="font-size:32px; margin-bottom:10px;">◆</div>
+    <div style="font-size:15px; font-weight:600; color:var(--ink); margin-bottom:6px;">No Mindsweeper sessions yet</div>
+    <p style="font-size:13px; max-width:460px; margin:0 auto 16px; line-height:1.6;">When a student completes a Mindsweeper assessment on this site, it appears here automatically and builds into a development record across sessions. Sessions are stored in this browser, and show up when the agent and this Console are served from the same website.</p>
+    <p style="font-size:12.5px; max-width:460px; margin:0 auto; line-height:1.6; color:var(--ink-tertiary);">The other tabs show a fully worked example student so you can explore the console before any live sessions exist.</p>
+  </div>
+
+  <div id="ms-content" style="display:none;">
+    <div class="panel" style="margin-bottom:18px;">
+      <div class="panel-header"><h2 class="panel-title">M³ trajectory across sessions</h2><span class="panel-meta" id="ms-session-count"></span></div>
+      <div style="position:relative; height:300px; padding:12px 4px 4px;"><canvas id="ms-m3-chart"></canvas></div>
+      <div style="font-size:11.5px; color:var(--ink-tertiary); line-height:1.6; padding:0 4px;">
+        Each line is one M³ construct, normalised to 0–100 so they sit on one axis. Motivation = RAI (−10…10) rescaled; Metacognition = mean of KoC &amp; RoC (1…5) rescaled; Resilient disposition = CYRM-R Personal sum (10…50) rescaled.
+      </div>
+    </div>
+
+    <div class="panel" style="margin-bottom:18px;">
+      <div class="panel-header"><h2 class="panel-title">Knowledge gaps — closing, persisting, new</h2></div>
+      <div id="ms-gaps"></div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-header"><h2 class="panel-title">Session timeline</h2><a id="ms-student-view-link" href="./Mindsweeper_Student.html" target="_blank" rel="noopener" class="panel-link" style="text-decoration:none;">Open student view →</a></div>
+      <div id="ms-timeline"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Dashboard ===== -->
+<section id="dashboard" class="section active">
+  <div class="section-header">
+    <div class="section-title-block">
+      <div class="section-eyebrow">Student dashboard · Monday · Week 1</div>
+      <h1>Yu Xiao Ting</h1>
+      <p class="section-subtitle">8-week intervention plan in progress · currently in Phase 1 (repair bottleneck + consolidate unstable content) · 12 days to next diagnostic checkpoint</p>
+    </div>
+    <div class="section-actions">
+      <button class="btn btn-secondary" onclick="showSection('tool-newtest')">+ Enter new test</button>
+      <button class="btn btn-primary">Export this week's plan</button>
+    </div>
+  </div>
+
+  <div class="verify-strip">
+    <span class="green-dot"></span>
+    <strong>Verified.</strong>
+    <span>All CCSS standards verified live via Learning Commons MCP · Last checked: 20 May 14:32 · Standards progression chain uses SAP Coherence Map · Learning components use ANet decomposition</span>
+  </div>
+
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="stat-label">Latest composite score</div>
+      <div class="stat-value warning">56%</div>
+      <div class="stat-delta down">↓ 15pt vs Test 1 (scope expanded)</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Topics needing intervention</div>
+      <div class="stat-value critical">4</div>
+      <div class="stat-delta">1 bottleneck · 2 Edexcel-only</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Strategies this week</div>
+      <div class="stat-value">3</div>
+      <div class="stat-delta">Worked Ex · Math Talks · Offload</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Next checkpoint</div>
+      <div class="stat-value">D-12</div>
+      <div class="stat-delta">End of Week 2 · target ≥ 75%</div>
+    </div>
+  </div>
+
+  <div class="focus-card">
+    <div class="focus-eyebrow">PHASE 1 · This week's focus</div>
+    <div class="focus-title">Repair bottleneck node 7.EE.A.2</div>
+    <div class="focus-desc">7.EE.A.2 (the "+5% = ×1.05" equivalence) is the root cause across Xiao Ting's entire knowledge graph. It propagates downward to 4 high-school standards (SAP fan-out verified), three of which correspond to items she has already lost marks on. Repairing this single conceptual gate will simultaneously reduce cognitive load across three downstream item families: compound interest, reverse percentage, and quadratic inequalities.</div>
+    <div class="focus-strats">
+      <span class="focus-strat-chip">Worked Examples (with error-example analysis)</span>
+      <span class="focus-strat-chip">Math Talks (verbal reasoning)</span>
+      <span class="focus-strat-chip">Cognitive Offloading (external working memory)</span>
+    </div>
+  </div>
+
+  <div class="panel-grid">
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">Items requiring attention</div>
+        <span class="panel-link" onclick="showSection('intervention')">View all →</span>
+      </div>
+      <ul class="activity-list">
+        <li class="activity-item">
+          <span class="activity-date">D-12</span>
+          <span class="activity-desc"><strong>Week 2 diagnostic checkpoint</strong>: 8 mixed items — 4 percent / 2 compound interest / 2 quadratic inequalities; target ≥ 75% with full working shown</span>
+          <span class="activity-tag">SCHED</span>
+        </li>
+        <li class="activity-item">
+          <span class="activity-date">This week</span>
+          <span class="activity-desc"><strong>Error-example deck (6 cards)</strong> must be ready — Card #2 (a − 0.15a = 0.85a) is the core item</span>
+          <span class="activity-tag">TODO</span>
+        </li>
+        <li class="activity-item">
+          <span class="activity-date">This week</span>
+          <span class="activity-desc"><strong>Bearings + probability bilingual vocabulary cards</strong> (Phase 2 prep) — 5 min/day</span>
+          <span class="activity-tag">PREP</span>
+        </li>
+      </ul>
+    </div>
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">Recent activity</div>
+        <span class="panel-link">Full log →</span>
+      </div>
+      <ul class="activity-list">
+        <li class="activity-item">
+          <span class="activity-date">7 MAY</span>
+          <span class="activity-desc">Diagnostic report v3 generated · bottleneck revised from 8.EE.A.1 to 7.EE.A.2 (API-verified)</span>
+          <span class="activity-tag">REPORT</span>
+        </li>
+        <li class="activity-item">
+          <span class="activity-date">1 APR</span>
+          <span class="activity-desc">Test 2 entered: 14/25 (56%) · scope expanded to full GCSE Foundation</span>
+          <span class="activity-tag">TEST</span>
+        </li>
+        <li class="activity-item">
+          <span class="activity-date">25 MAR</span>
+          <span class="activity-desc">Test 1 entered: 32/45 (71%)</span>
+          <span class="activity-tag">TEST</span>
+        </li>
+        <li class="activity-item">
+          <span class="activity-date">19 MAR</span>
+          <span class="activity-desc">Peer teaching observation: notably engaged when teaching a classmate</span>
+          <span class="activity-tag">OBS</span>
+        </li>
+        <li class="activity-item">
+          <span class="activity-date">12 MAR</span>
+          <span class="activity-desc">Initial diagnostic: 32% · working memory overload and test anxiety as primary signals</span>
+          <span class="activity-tag">INIT</span>
+        </li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Trajectory ===== -->
+<section id="trajectory" class="section">
+  <div class="section-header">
+    <div class="section-title-block">
+      <div class="section-eyebrow">LONGITUDINAL · TRAJECTORY</div>
+      <h1>Progress trajectory</h1>
+      <p class="section-subtitle">From the 11 March baseline (32%) to the present, with intervention milestones and diagnostic checkpoints overlaid. This is the central view of Mindsweeper's longitudinal tracking model.</p>
+    </div>
+    <div class="section-actions">
+      <button class="btn btn-ghost">Export PNG</button>
+      <button class="btn btn-secondary">Overlay comparison cohort</button>
+    </div>
+  </div>
+  <div class="traj-wrap">
+    <div class="traj-canvas-wrap"><canvas id="traj-chart"></canvas></div>
+    <div class="traj-events">
+      <div class="traj-event"><span class="date">11 MAR</span><span class="label">Initial diagnostic · 32%</span>Baseline test; identified working memory overload and test anxiety as the two principal signals</div>
+      <div class="traj-event"><span class="date">25 MAR</span><span class="label">Test 1 · 71%</span>Marked improvement after two weeks of targeted training</div>
+      <div class="traj-event"><span class="date">1 APR</span><span class="label">Test 2 · 56%</span>Scope expanded to the full GCSE Foundation set; the decline reflects expanded scope, not regression</div>
+      <div class="traj-event"><span class="date">7 MAY</span><span class="label">Diagnostic report v3</span>Bottleneck node 7.EE.A.2 confirmed; the 8-week plan begins</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Intervention tracker ===== -->
+<section id="intervention" class="section">
+  <div class="section-header">
+    <div class="section-title-block">
+      <div class="section-eyebrow">EXECUTION · 8 WEEKS</div>
+      <h1>Intervention execution tracker</h1>
+      <p class="section-subtitle">Execution view derived from the §⑧ plan. Tick off completed strategies; progress is automatically aggregated to the dashboard.</p>
+    </div>
+    <div class="section-actions">
+      <button class="btn btn-ghost">Export execution log</button>
+      <button class="btn btn-secondary">Edit plan</button>
+    </div>
+  </div>
+  <div class="phase-tabs" id="phase-tabs">
+    <button class="phase-tab active" data-phase="p1"><span class="num">PHASE 1 · WK 1-2</span><span class="name">Repair bottleneck</span><span class="week">in progress</span></button>
+    <button class="phase-tab" data-phase="p2"><span class="num">PHASE 2 · WK 3-4</span><span class="name">Conceptual scaffolding</span><span class="week">upcoming</span></button>
+    <button class="phase-tab" data-phase="p3"><span class="num">PHASE 3 · WK 5-6</span><span class="name">Metacognitive calibration</span><span class="week">parallel</span></button>
+    <button class="phase-tab" data-phase="p4"><span class="num">PHASE 4 · WK 7-8</span><span class="name">Integration + CEM</span><span class="week">upcoming</span></button>
+  </div>
+
+  <div id="phase-panel-p1" class="phase-panel active">
+    <div class="phase-hero">
+      <h2>Phase 1 · Repair bottleneck + consolidate unstable content</h2>
+      <p style="font-size: 13px; color: var(--ink-secondary); line-height: 1.7;">Focus: 7.EE.A.2 (multiplier-rate equivalence) plus reverse percentage, compound interest, and quadratic inequalities. Repairing this conceptual gate simultaneously reduces cognitive load across the three downstream item families.</p>
+      <div class="phase-progress-bar"><div class="phase-progress-fill" id="p1-progress" style="width: 22%"></div></div>
+      <div class="phase-progress-label"><span id="p1-progress-label">2/9 strategies executed</span><span>Week 1 · Day 3</span></div>
+    </div>
+    <div class="strategy">
+      <div class="strat-head">
+        <div class="strat-check done" data-strat="p1s1"></div>
+        <div class="strat-info">
+          <div class="strat-name"><span class="strat-tag">LVN</span>Worked Examples</div>
+          <div class="strat-targets">Targets: Working Memory · Long-term Memory</div>
+          <div class="strat-desc">Present fully worked examples first, then have the student attempt independently. LVN Math 7-10 indicates that <strong>error-example analysis</strong> is especially effective for conceptual development — present a flawed example (using 0.15 instead of 0.85) and have her identify and articulate where it went wrong.</div>
+          <div class="strat-action"><strong>Concrete actions:</strong> A 6-card mini-deck. Card 1: a + 0.05a = 1.05a (canonical 7.EE.A.2 example). Card 2: a − 0.15a = 0.85a (decay variant). Card 3: 18000 × 0.85³ (correct version of PT1-Q22b). Cards 4-6 introduce further variants. Gradually fade scaffolding: full solution → middle steps blank → final step blank → independent completion.</div>
+          <div class="strat-research">Research basis: Sweller (1988) cognitive load theory; Renkl (2014) worked example effect</div>
+        </div>
+      </div>
+    </div>
+    <div class="strategy">
+      <div class="strat-head">
+        <div class="strat-check done" data-strat="p1s2"></div>
+        <div class="strat-info">
+          <div class="strat-name"><span class="strat-tag">LVN</span>Math Talks</div>
+          <div class="strat-targets">Targets: Math Communication · Long-term Memory · Self-efficacy</div>
+          <div class="strat-desc">Have the student verbalise her mathematical reasoning. LVN Math Talks notes that articulating reasoning aloud consolidates long-term memory more reliably than silent practice.</div>
+          <div class="strat-action"><strong>Concrete actions:</strong> 15 minutes per session. Sample prompt: "Why is the multiplier for a 15% decrease 0.85 rather than 0.15? Explain it to me as if you were teaching a younger student." If she gets stuck, <strong>do not interrupt</strong> — wait for her to self-correct; that struggle is where learning happens.</div>
+          <div class="strat-research">Research basis: Chi &amp; Wylie (2014) ICAP framework; Schoenfeld (1992)</div>
+        </div>
+      </div>
+    </div>
+    <div class="strategy">
+      <div class="strat-head">
+        <div class="strat-check" data-strat="p1s3"></div>
+        <div class="strat-info">
+          <div class="strat-name"><span class="strat-tag">LVN</span>Cognitive Offloading</div>
+          <div class="strat-targets">Target: Working Memory</div>
+          <div class="strat-desc">Explicitly teach her to use paper as external working memory. Tully et al. (2025) show that paper-based offloading yields the greatest benefit for students with prior knowledge in place — precisely Xiao Ting's profile.</div>
+          <div class="strat-action"><strong>Concrete actions:</strong> A three-step rule for every multi-step problem: (1) write the givens; (2) write the requirement; (3) state the method choice before computing. Apply this rule to every multi-step problem for two weeks. The goal is to automate external offloading before time pressure activates.</div>
+          <div class="strat-research">Research basis: Risko &amp; Gilbert (2016); Tully et al. (2025) Br J Educ Psychol</div>
+        </div>
+      </div>
+    </div>
+    <div class="checkpoint">
+      <strong>Diagnostic checkpoint (end of Week 2):</strong> 8 mixed items — 4 percentage change, 2 compound interest, 2 quadratic inequalities. Target ≥ 75%, timed conditions, all working shown.
+    </div>
+  </div>
+
+  <div id="phase-panel-p2" class="phase-panel">
+    <div class="empty-state">
+      <div class="empty-state-title">Phase 2 has not yet started</div>
+      <div class="empty-state-desc">Unlocks at Week 3 · Focus: bearings, similar solids, quadratic formula, independent events with complement</div>
+      <button class="btn btn-secondary">Preview strategy list</button>
+    </div>
+  </div>
+  <div id="phase-panel-p3" class="phase-panel">
+    <div class="empty-state">
+      <div class="empty-state-title">Phase 3 runs in parallel with Phases 1-2</div>
+      <div class="empty-state-desc">Metacognitive calibration training · Focus: turn the predictive bias documented in §⑦ into a measurable skill</div>
+    </div>
+  </div>
+  <div id="phase-panel-p4" class="phase-panel">
+    <div class="empty-state">
+      <div class="empty-state-title">Phase 4 — integration period</div>
+      <div class="empty-state-desc">Weeks 7-8 · Full-length CEM simulations + longitudinal evidence presentation</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Cover ===== -->
+<section id="cover" class="section">
+  <div class="section-header">
+    <div class="section-title-block">
+      <div class="section-eyebrow">REPORT v3 · COVER</div>
+      <h1>Diagnostic report cover</h1>
+      <p class="section-subtitle">Student profile, testing history, and report generation metadata</p>
+    </div>
+  </div>
+  <div class="verify-strip">
+    <span class="green-dot"></span><strong>API-verified.</strong>
+    <span>Every CCSS code has been verified through the three-step Learning Commons workflow. v1 initially misidentified 8.EE.A.1 as the bottleneck; the API corrected this to 7.EE.A.2.</span>
+  </div>
+  <div class="panel">
+    <div class="panel-header"><div class="panel-title">Student profile</div><span class="panel-link">Maintained by Paula Zheng</span></div>
+    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; font-size: 13px;">
+      <div><div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--ink-muted); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px;">Name</div><div style="font-family: 'Source Serif 4', serif; font-size: 16px; font-weight: 600;">Yu Xiao Ting</div></div>
+      <div><div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--ink-muted); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px;">Course</div><div style="font-family: 'Source Serif 4', serif; font-size: 16px; font-weight: 600;">Edexcel GCSE 9-1 Foundation</div></div>
+      <div><div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--ink-muted); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px;">Target</div><div style="font-family: 'Source Serif 4', serif; font-size: 16px; font-weight: 600;">Perse Year 9 · CEM</div></div>
+      <div><div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--ink-muted); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px;">Diagnostic history</div><div style="font-size: 13px;">PT1 (25 Mar) 71% → PT2 (1 Apr) 56%</div></div>
+      <div><div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--ink-muted); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px;">Report generated</div><div style="font-size: 13px;">7 May 2026 · v3 (EN)</div></div>
+      <div><div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--ink-muted); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px;">Next checkpoint</div><div style="font-size: 13px;">End of Week 2 · 8-item mixed diagnostic</div></div>
+    </div>
+  </div>
+  <div style="margin-top: 18px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;">
+    <div class="stat-card"><div class="stat-label">Topics needing intervention</div><div class="stat-value critical">4</div></div>
+    <div class="stat-card"><div class="stat-label">Topics to watch</div><div class="stat-value warning">4</div></div>
+    <div class="stat-card"><div class="stat-label">Topics consolidated</div><div class="stat-value ok">4</div></div>
+  </div>
+</section>
+
+<!-- ===== Sec 1: Topic scores ===== -->
+<section id="sec1" class="section">
+  <div class="section-header">
+    <div class="section-title-block">
+      <div class="section-eyebrow">§① CURRENT PERFORMANCE</div>
+      <h1>Topic-level scores</h1>
+      <p class="section-subtitle">Aggregated across both tests. Topic names follow Edexcel GCSE 9-1 Foundation conventions; standard codes are CCSS-M (verified via Learning Commons). Bearings and similar solids are Edexcel-only with no clean CCSS anchor, and are flagged accordingly.</p>
+    </div>
+  </div>
+  <div class="data-table">
+    <div class="table-toolbar">
+      <span class="filter-chip active" data-filter="all">All 12</span>
+      <span class="filter-chip" data-filter="critical">Intervene 4</span>
+      <span class="filter-chip" data-filter="warning">Watch 4</span>
+      <span class="filter-chip" data-filter="ok">Consolidated 4</span>
+      <span class="filter-spacer"></span>
+      <span class="filter-count">Click any row to expand evidence</span>
+    </div>
+    <div id="topic-rows"></div>
+  </div>
+</section>
+
+<!-- ===== Sec 2: Performance vs Knowledge ===== -->
+<section id="sec2" class="section">
+  <div class="section-header">
+    <div class="section-title-block">
+      <div class="section-eyebrow">§② PERFORMANCE vs KNOWLEDGE GAP</div>
+      <h1>Not every lost mark is a knowledge gap</h1>
+      <p class="section-subtitle">Conventional diagnostics treat every wrong answer as a knowledge gap. Cross-test analysis shows that a substantial portion of Xiao Ting's lost marks stem from <strong>execution failure rather than conceptual gaps</strong>. Separating the two prevents the intervention plan from re-teaching material she has already mastered.</p>
+    </div>
+  </div>
+  <div class="gap-table-wrap">
+    <div class="gap-summary">
+      <div><div class="gap-bignum">~7</div><div class="gap-bignum-label">marks</div></div>
+      <div class="gap-summary-text">Of the 70 marks across both tests, <strong>roughly 7 (~10%) were lost to execution failure despite intact conceptual understanding</strong>. Correcting this category alone would lift PT1 to ~80% and PT2 to ~75% — closer to her actual ceiling.</div>
+    </div>
+    <table class="gap-table">
+      <thead><tr><th style="width: 12%">Item</th><th style="width: 16%">Category</th><th style="width: 30%">What went wrong</th><th>Evidence of intact concept</th></tr></thead>
+      <tbody>
+        <tr><td class="qid">PT1-Q11</td><td><span class="gap-cat arith">Arithmetic</span></td><td>Reverse-percentage method correct; chained multiplication (×1.025 × 1.032) miscalculated</td><td>Method steps visible. Multi-step computation without a calculator induced working memory overload</td></tr>
+        <tr><td class="qid">PT1-Q18b</td><td><span class="gap-cat arith">Graph-reading precision</span></td><td>Read x-intercepts as −0.7 and 4.8 (true values ≈ −0.65, 4.65); wrote several values and crossed them out</td><td>(0, −3) and vertex (2, −7) both correct — the graph-reading concept is present; precision is insufficient</td></tr>
+        <tr><td class="qid">PT1-Q21a</td><td><span class="gap-cat work">Working not shown</span></td><td>Factoring steps illegible (2 marks lost), but (b) gave x = 5 or −2</td><td>(b) fully correct — she knew it but did not record the working</td></tr>
+        <tr><td class="qid">PT1-Q22b</td><td><span class="gap-cat arith">Arithmetic</span></td><td>Wrote the correct compound-interest formula 18000 × 0.85³, but computed it as 9900 (should be ≈ 11054)</td><td>Method chain correct — compound-interest formula applied correctly</td></tr>
+        <tr><td class="qid">PT2-Q1</td><td><span class="gap-cat dual">Second-guessing</span></td><td>Circled A (x &gt; 5, correct) and C (x &lt; 5); final answer C</td><td>First circle was correct — she overturned her own answer under uncertainty</td></tr>
+        <tr><td class="qid">PT2-Q10</td><td><span class="gap-cat dual">Second-guessing</span></td><td>Circled B (9, correct) and D (5); final answer D</td><td>She knew the answer — second-guessing led to the wrong final choice</td></tr>
+        <tr><td class="qid">PT2-Q15</td><td><span class="gap-cat notation">Notation misread</span></td><td>Read "y:x" as "x:y" and selected 3:8 instead of 8:3</td><td>Algebraic manipulation 3y = 8x correct — only the ratio order was reversed</td></tr>
+        <tr><td class="qid">PT2-Q22c</td><td><span class="gap-cat arith">Cascading error</span></td><td>Method correct (volume × unit price); the volume input came from the incorrect result of (b)</td><td>The "volume × unit price = total cost" model itself is correct</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ===== Sec 3: Consolidation ===== -->
+<section id="sec3" class="section">
+  <div class="section-header">
+    <div class="section-title-block">
+      <div class="section-eyebrow">§③ CONSOLIDATION GRADIENT</div>
+      <h1>Consolidation gradient</h1>
+      <p class="section-subtitle">Not all "knowing" is equivalent. Before designing interventions, we need to distinguish the maturity of the underlying conceptual representations.</p>
+    </div>
+  </div>
+  <div class="data-table">
+    <div style="padding: 20px 24px;">
+      <div style="display: grid; grid-template-columns: 180px 1fr; gap: 14px; padding: 12px 0; border-bottom: 1px solid var(--border);">
+        <div><span class="badge ok">Robust</span></div>
+        <div style="font-size: 13px; color: var(--ink-secondary); line-height: 1.65;">Correct across ≥ 2 independent items and conditions, including under time pressure.</div>
+      </div>
+      <div style="display: grid; grid-template-columns: 180px 1fr; gap: 14px; padding: 12px 0; border-bottom: 1px solid var(--border);">
+        <div><span class="badge" style="background: var(--blue-bg); color: var(--blue); border: 1px solid var(--blue-border);">Emerging</span></div>
+        <div style="font-size: 13px; color: var(--ink-secondary); line-height: 1.65;">Correct under standard conditions; no observed breakdown under pressure.</div>
+      </div>
+      <div style="display: grid; grid-template-columns: 180px 1fr; gap: 14px; padding: 12px 0; border-bottom: 1px solid var(--border);">
+        <div><span class="badge warning">Recognised but unstable</span></div>
+        <div style="font-size: 13px; color: var(--ink-secondary); line-height: 1.65;">The student can write the correct formula or method (conceptual representation is present), but execution is unstable. PT1-Q11 and PT1-Q22b fall in this band.</div>
+      </div>
+      <div style="display: grid; grid-template-columns: 180px 1fr; gap: 14px; padding: 12px 0;">
+        <div><span class="badge critical">Introduced not internalised</span></div>
+        <div style="font-size: 13px; color: var(--ink-secondary); line-height: 1.65;">Cannot map the problem onto the correct procedure; the conceptual structure has not yet formed. Bearings and similar solids fall in this band.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Sec 4: Knowledge tree ===== -->
+<section id="sec4" class="section">
+  <div class="section-header">
+    <div class="section-title-block">
+      <div class="section-eyebrow">§④ KNOWLEDGE TREE · BACKWARD PROGRESSION</div>
+      <h1>Knowledge tree — backward traversal</h1>
+      <p class="section-subtitle">Trace prerequisites downward from the current grade band (9-10). Click any node to view the evidence, learning components, and the official standard statement. Clicking the bottleneck node 7.EE.A.2 automatically reveals its forward fan-out.</p>
+    </div>
+  </div>
+  <div class="kg-toolbar">
+    <div class="kg-legend">
+      <span class="kg-legend-chip c-r">Critical</span>
+      <span class="kg-legend-chip c-a">Unstable</span>
+      <span class="kg-legend-chip c-g">Robust</span>
+      <span class="kg-legend-chip c-n">Prereq</span>
+      <span class="kg-legend-chip c-k">Bottleneck</span>
+    </div>
+  </div>
+  <div class="kg-level">
+    <div class="kg-level-head"><span class="kg-grade-tag">Grade 9-10 · current</span><span class="kg-level-note">Where the visible gaps live</span></div>
+    <div class="kg-nodes">
+      <div class="kg-node s-critical" data-id="HSA-SSE.B.3.c"><div class="code">HSA-SSE.B.3.c</div><div class="title">Compound interest · decay</div><div class="score">0% · PT1-Q22</div></div>
+      <div class="kg-node s-critical" data-id="Similar solids"><div class="code">Edexcel · no CCSS</div><div class="title">Similar solids · k²/k³</div><div class="score">0% · PT2-Q22</div></div>
+      <div class="kg-node s-critical" data-id="HSA-REI.B.4.b"><div class="code">HSA-REI.B.4.b</div><div class="title">Quadratic equations</div><div class="score">partial · PT2-Q23</div></div>
+      <div class="kg-node s-critical" data-id="Bearings"><div class="code">Edexcel · no CCSS</div><div class="title">Bearings</div><div class="score">0% · PT2-Q3</div></div>
+      <div class="kg-node s-prereq" data-id="HSA-SSE.A.1" data-downstream="1" style="display:none;"><div class="code">HSA-SSE.A.1</div><div class="title">Interpret expressions in context</div><div class="score">downstream</div></div>
+      <div class="kg-node s-prereq" data-id="HSA-SSE.B.3.a" data-downstream="1" style="display:none;"><div class="code">HSA-SSE.B.3.a</div><div class="title">Factor to reveal zeros</div><div class="score">downstream</div></div>
+      <div class="kg-node s-prereq" data-id="HSA-SSE.B.3.b" data-downstream="1" style="display:none;"><div class="code">HSA-SSE.B.3.b</div><div class="title">Complete the square</div><div class="score">downstream</div></div>
+    </div>
+  </div>
+  <div class="kg-level">
+    <div class="kg-level-head"><span class="kg-grade-tag">Grade 8</span><span class="kg-level-note">Prerequisites here are robust</span></div>
+    <div class="kg-nodes">
+      <div class="kg-node s-ok" data-id="8.EE.A.1"><div class="code">8.EE.A.1</div><div class="title">Integer exponents</div><div class="score">✓ PT1-Q4</div></div>
+      <div class="kg-node s-ok" data-id="8.G.B.7"><div class="code">8.G.B.7</div><div class="title">Pythagorean theorem</div><div class="score">✓ PT2-Q13, Q23a</div></div>
+      <div class="kg-node s-ok" data-id="8.F.A.1"><div class="code">8.F.A.1</div><div class="title">Functions and evaluation</div><div class="score">✓ PT1-Q9</div></div>
+      <div class="kg-node s-prereq" data-id="8.F.B.4"><div class="code">8.F.B.4</div><div class="title">Linear rate of change</div><div class="score">untested</div></div>
+    </div>
+  </div>
+  <div class="kg-level">
+    <div class="kg-level-head"><span class="kg-grade-tag">Grade 7 · root layer</span><span class="kg-level-note">Where the rotten root lives</span></div>
+    <div class="kg-nodes">
+      <div class="kg-node s-bottleneck" data-id="7.EE.A.2"><div class="code">7.EE.A.2 <span class="kg-bot-badge">ROOT</span></div><div class="title">Rewrite expressions to reveal relationships</div><div class="score">fan-out = 4 · core gap</div></div>
+      <div class="kg-node s-ok" data-id="7.RP.A.2"><div class="code">7.RP.A.2</div><div class="title">Proportional relationships</div><div class="score">✓ ×4 items</div></div>
+      <div class="kg-node s-warning" data-id="7.RP.A.3"><div class="code">7.RP.A.3</div><div class="title">Multi-step ratio and percent</div><div class="score">unstable · PT1-Q11</div></div>
+      <div class="kg-node s-prereq" data-id="7.SP.C.8"><div class="code">7.SP.C.8</div><div class="title">Compound event probability</div><div class="score">50% · PT2</div></div>
+    </div>
+  </div>
+  <div class="kg-level">
+    <div class="kg-level-head"><span class="kg-grade-tag">Grade 6</span><span class="kg-level-note">SAP: stop here, do not regress further</span></div>
+    <div class="kg-nodes">
+      <div class="kg-node s-ok" data-id="6.RP.A.1"><div class="code">6.RP.A.1</div><div class="title">Ratio concept</div><div class="score">✓ PT2-Q4, Q21a</div></div>
+      <div class="kg-node s-ok" data-id="6.NS.B.4"><div class="code">6.NS.B.4</div><div class="title">HCF and LCM</div><div class="score">✓ PT1-Q2, Q3</div></div>
+      <div class="kg-node s-warning" data-id="6.RP.A.3.d"><div class="code">6.RP.A.3.d</div><div class="title">Unit conversion via ratio</div><div class="score">partial · PT2-Q19c</div></div>
+      <div class="kg-node s-prereq" data-id="6.G.A.2"><div class="code">6.G.A.2</div><div class="title">Volume formulas</div><div class="score">untested</div></div>
+    </div>
+  </div>
+  <div class="kg-detail" id="kg-detail">
+    <div class="kg-detail-empty">Click any node to view the official standard statement, evidence from this diagnostic, and learning components (ANet decomposition).</div>
+  </div>
+</section>
+
+<!-- ===== Sec 5: Bottleneck ===== -->
+<section id="sec5" class="section">
+  <div class="section-header">
+    <div class="section-title-block">
+      <div class="section-eyebrow">§⑤ BOTTLENECK ANALYSIS</div>
+      <h1>Bottleneck node analysis</h1>
+      <p class="section-subtitle">In a standards progression graph, certain prerequisites act as gateways to multiple downstream standards. Repairing these nodes propagates positive effects downstream along the dependency chain.</p>
+    </div>
+  </div>
+  <div class="bottleneck-hero">
+    <div class="bottleneck-hero-code">🔴 BOTTLENECK · 7.EE.A.2</div>
+    <div class="bottleneck-hero-title">Translating "additive stacking" into "multiplicative stacking"</div>
+    <div class="bottleneck-body">
+      <strong>The official standard statement already describes Xiao Ting's core error:</strong> "Understand that rewriting an expression in different forms in a problem context can shed light on the problem and how the quantities in it are related. For example, a + 0.05a = 1.05a means that 'increase by 5%' is the same as 'multiply by 1.05.'"<br><br>
+      On PT1-Q22a, Xiao Ting wrote 0.15 instead of 0.85 (the decay multiplier). This is a textbook 7.EE.A.2 failure — she has not yet internalised the equivalence between the additive language ("decrease by 15%") and the multiplicative language ("× 0.85"). This single conceptual gateway underlies the vast majority of her downstream high-school SSE work.
+    </div>
+    <div class="fanout-visual">
+      <div class="fanout-visual-label">SAP-verified forward fan-out · 4 standards</div>
+      <div class="fanout-tree">
+        <div class="root">7.EE.A.2 · Grade 7 · Rewriting expressions to reveal relationships</div>
+        <div class="arrow">↓ ↓ ↓ ↓</div>
+        <div class="leaf"><div class="leaf-code">HSA-SSE.A.1</div><div class="leaf-text">Interpret expressions in context</div></div>
+        <div class="leaf"><div class="leaf-code">HSA-SSE.B.3.a</div><div class="leaf-text">Factor to reveal zeros</div></div>
+        <div class="leaf"><div class="leaf-code">HSA-SSE.B.3.b</div><div class="leaf-text">Complete the square</div></div>
+        <div class="leaf"><div class="leaf-code">HSA-SSE.B.3.c</div><div class="leaf-text">Compound interest / decay (Q22)</div></div>
+      </div>
+      <div style="font-size: 11px; color: var(--ink-muted); margin-top: 12px; font-style: italic;">Verified via Learning Commons: <code style="font-family: 'JetBrains Mono', monospace;">find_standards_progression_from_standard(direction='forward')</code>, UUID = 6b9d6fe1-d7cc-11e8-824f-0242ac160002. 7.EE.A.2 has no upstream prerequisite in the SAP map; it is a clean root node.</div>
+    </div>
+  </div>
+  <div style="background: linear-gradient(135deg, #faf5ff, #eff6ff); border: 1px solid var(--purple-border); border-radius: 12px; padding: 22px 24px;">
+    <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--purple); letter-spacing: 1.5px; font-weight: 600;">🟣 SECONDARY · 6.RP.A.3.d</div>
+    <h3 style="color: var(--purple); margin-top: 4px;">"Rate as multiplier" in unit conversion</h3>
+    <p style="font-size: 13px; color: var(--ink-secondary); line-height: 1.75; margin-top: 10px;">Speed conversion m/s → km/h requires ×3.6 (marks lost on PT2-Q19c). This is the same conceptual move as the bottleneck — translating a rate into a multiplier. It can be trained alongside 7.EE.A.2 during Phase 1.</p>
+  </div>
+</section>
+
+<!-- ===== Sec 6: Factors ===== -->
+<section id="sec6" class="section">
+  <div class="section-header">
+    <div class="section-title-block">
+      <div class="section-eyebrow">§⑥ INTERVENABLE FACTORS</div>
+      <h1>Which factors are limiting performance</h1>
+      <p class="section-subtitle">Based on the Digital Promise Learner Variability Navigator (LVN) Math 7-10 model. The lead factor (cognitive load) is anchored on the strongest observation from the 12 March initial diagnostic.</p>
+    </div>
+  </div>
+  <div class="factor-grid">
+    <div class="factor-card lead">
+      <div class="factor-icon">🧠</div>
+      <div class="factor-name">Working memory overload under non-calculator conditions <span class="trainable med">Trainable · moderate</span></div>
+      <div class="factor-cat">COGNITION · WORKING MEMORY · LEAD FACTOR</div>
+      <div class="factor-desc">The core factor in this case and the strongest signal from the 12 March initial diagnostic: <em>"Frequent sighing, sensitive to ambient noise; basic arithmetic and procedural execution consumed most of her cognitive resources, leaving insufficient capacity for logical reasoning."</em> Per the Baddeley &amp; Hitch working memory model, mental arithmetic under time pressure simultaneously occupies the central executive (decision-making), the phonological loop (verbal computation), and the visuospatial sketchpad (figure processing). When all three are loaded, the executive resource for self-monitoring is exhausted, producing the three observed error classes: (1) multi-step arithmetic collapse; (2) MCQ revisions (chose and changed); (3) mental computation leaving no written trace.</div>
+      <div class="factor-impact">
+        <div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--ink-muted); letter-spacing: 1px; margin-bottom: 4px; text-transform: uppercase;">Items directly explained</div>
+        <span class="impact-chip">PT1-Q11</span><span class="impact-chip">PT1-Q21a</span><span class="impact-chip">PT1-Q22b</span><span class="impact-chip">PT2-Q1</span><span class="impact-chip">PT2-Q10</span><span class="impact-chip">PT2-Q22c</span>
+      </div>
+    </div>
+    <div class="factor-card">
+      <div class="factor-icon">😰</div>
+      <div class="factor-name">Test anxiety <span class="trainable med">Trainable · moderate</span></div>
+      <div class="factor-cat">EMOTION · MATH ANXIETY</div>
+      <div class="factor-desc">Anxiety consumes working memory resources (Ashcraft &amp; Kirk, 2001). Xiao Ting exhibits a "double-pick" pattern — initially correct, then changed to wrong upon second-guessing. Expressive writing (Ramirez &amp; Beilock, 2011) is a well-evidenced, low-cost intervention.</div>
+    </div>
+    <div class="factor-card">
+      <div class="factor-icon">🎯</div>
+      <div class="factor-name">Metacognitive calibration <span class="trainable high">Trainable · high</span></div>
+      <div class="factor-cat">METACOGNITION · SELF-ASSESSMENT</div>
+      <div class="factor-desc">Systematic predictive bias: she underestimates recently mastered content and overestimates familiar but unstable content. A 4-6 week structured "predict-verify" protocol responds strongly to this pattern. This is the most direct metacognitive intervention lever.</div>
+    </div>
+    <div class="factor-card">
+      <div class="factor-icon">⏱</div>
+      <div class="factor-name">Stamina / 35-minute fatigue threshold <span class="trainable med">Trainable · moderate</span></div>
+      <div class="factor-cat">SELF-REGULATION · STAMINA</div>
+      <div class="factor-desc">The 12 March observation showed clear attentional decay after 35 minutes. The full-length CEM runs 67 minutes; Phase 4 schedules progressive duration training (30 → 40 → 50 → 67 min).</div>
+    </div>
+    <div class="factor-card">
+      <div class="factor-icon">🗣</div>
+      <div class="factor-name">Mathematical English vocabulary <span class="trainable high">Trainable · high</span></div>
+      <div class="factor-cat">VOCABULARY · LANGUAGE</div>
+      <div class="factor-desc">Cambridge CEM / Perse admissions require precision in English mathematical vocabulary. Bilingual flashcards for bearings and probability terms, 5 min/day. Schleppegrell (2007), Cummins (2008) BICS/CALP.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Sec 7: Character ===== -->
+<section id="sec7" class="section">
+  <div class="section-header">
+    <div class="section-title-block">
+      <div class="section-eyebrow">§⑦ CHARACTER PROFILE · CALIBRATION</div>
+      <h1>Learner traits and metacognitive calibration</h1>
+      <p class="section-subtitle">A working profile inferred from approximately four weeks of observation (not a diagnostic conclusion). OCEAN inferences from a single snapshot serve only as working hypotheses and require validation through further observation.</p>
+    </div>
+  </div>
+  <div class="char-grid">
+    <div class="char-card">
+      <h4>Conscientiousness <span class="char-rating high">High</span></h4>
+      <p>Step completeness (except PT1-Q21a), assignment return rate, and spontaneous note-taking habits are all high. Strong willingness to redo missed items.</p>
+      <div class="char-evidence">Evidence: PT1 self-assessment cover · every assignment returned · error notebook</div>
+    </div>
+    <div class="char-card">
+      <h4>Neuroticism <span class="char-rating med">Moderate</span></h4>
+      <p>Test anxiety is significant but not extreme. The "double-pick" pattern, the 35-minute fatigue threshold, and pre-test emotional expression ("more or less") are the principal signals.</p>
+      <div class="char-evidence">Evidence: PT2-Q1, Q10 double-picks · 12 March observation</div>
+    </div>
+    <div class="char-card">
+      <h4>Openness <span class="char-rating high">High</span></h4>
+      <p>Absorbs new content quickly; willing to attempt unfamiliar item types. Her course overview also shows interest in politics and history — supporting genuine intellectual curiosity.</p>
+      <div class="char-evidence">Evidence: 19 March peer-teaching performance · course overview</div>
+    </div>
+    <div class="char-card">
+      <h4>Growth vs fixed mindset <span class="char-rating mixed">Transitional</span></h4>
+      <p>Shifting toward a growth orientation; not yet stable. Growth signals: re-engages with errors, accepts peer teaching, absorbs new content quickly. Fixed signals: defensive pre-test prediction ("average level, easy to reach"), unspecific post-test goals.</p>
+      <div class="char-evidence">Evidence: post-test (d) reflection · pre-test "average" anchoring</div>
+    </div>
+    <div class="char-card">
+      <h4>Motivation type <span class="char-rating mixed">Mixed</span></h4>
+      <p>External motivation is clear (the Perse Year 9 target), but <strong>not purely extrinsic</strong>. The PT1 cover self-assessment — "didn't take the long-answer items seriously" — reflects an internal standard: she has her own definition of "doing well."</p>
+      <div class="char-evidence">Evidence: PT1 cover self-assessment · breadth of intellectual interest</div>
+    </div>
+    <div class="char-card">
+      <h4>Self-assessment accuracy <span class="char-rating low">Systematic bias</span></h4>
+      <p><strong>Asymmetric calibration:</strong> <span style="color: var(--green)">underestimates</span> recently mastered content (trigonometry 1/5 → 100%); <span style="color: var(--red)">overestimates</span> familiar but fragile content (inequalities 3/5 → 50%). This is the most direct lever for metacognitive intervention.</p>
+      <div class="char-evidence">Evidence: see calibration table below</div>
+    </div>
+  </div>
+  <h3 style="margin-top: 24px; margin-bottom: 8px;">📐 Self-assessment calibration (Test 2)</h3>
+  <div class="calib-table">
+    <div class="calib-row head"><div>Topic</div><div>Predicted</div><div>Actual</div><div>Gap</div><div>Calibration insight</div></div>
+    <div class="calib-row"><div>Trigonometry (Pythagoras + ratios)</div><div class="conf">1/5</div><div class="conf">100%</div><div class="gap-val under">-3</div><div class="insight"><strong>Severe underestimate.</strong> Newly mastered content has not yet been integrated into the "I can do this" self-schema.</div></div>
+    <div class="calib-row"><div>Inequalities and algebra</div><div class="conf">3/5</div><div class="conf">50%</div><div class="gap-val over">+1</div><div class="insight">Familiar but unstable content is easy to overestimate.</div></div>
+    <div class="calib-row"><div>Probability</div><div class="conf">4/5</div><div class="conf">50%</div><div class="gap-val over">+2</div><div class="insight"><strong>Overconfident.</strong> Basic probability is stable; complement/tree are not yet consolidated.</div></div>
+    <div class="calib-row"><div>Ratio and proportion</div><div class="conf">4/5</div><div class="conf">100%</div><div class="gap-val cal">0</div><div class="insight">Calibration accurate — her most stable area.</div></div>
+    <div class="calib-row"><div>Volume and surface area (including similar solids)</div><div class="conf">3/5</div><div class="conf">~33%</div><div class="gap-val over">+2</div><div class="insight">Did not distinguish the two sub-difficulties of "basic volume" and "similar solids".</div></div>
+  </div>
+</section>
+
+<!-- ===== Sec 8: Plan (read-only) ===== -->
+<section id="sec8" class="section">
+  <div class="section-header">
+    <div class="section-title-block">
+      <div class="section-eyebrow">§⑧ INTERVENTION PLAN · READ-ONLY</div>
+      <h1>Eight-week, four-phase intervention plan</h1>
+      <p class="section-subtitle">This is the plan as written in the report. For execution tracking, go to the "Intervention tracker" section in the left navigation, where strategies can be checked off, reflections recorded, and progress monitored.</p>
+    </div>
+    <div class="section-actions">
+      <button class="btn btn-secondary" onclick="showSection('intervention')">Go to execution tracker →</button>
+    </div>
+  </div>
+  <div style="background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 22px 26px;">
+    <p style="font-size: 13px; color: var(--ink-secondary); line-height: 1.7;">Each strategy is tagged with its <span class="strat-tag">LVN</span> name, the corresponding intervenable factor, and the research basis. The plan addresses content, study habits, mathematical thinking, and learning method. It is compatible with the eight-week transition programme from the 12 March report, with Mindsweeper-side priority refinements.</p>
+    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 18px;">
+      <div style="background: var(--bg-content); padding: 14px 16px; border-radius: 8px;">
+        <div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--ink-muted); letter-spacing: 1px; margin-bottom: 4px;">PHASE 1 · WK 1-2</div>
+        <div style="font-family: 'Source Serif 4', serif; font-weight: 600; font-size: 14px; margin-bottom: 4px;">Repair bottleneck</div>
+        <div style="font-size: 12px; color: var(--ink-secondary);">7.EE.A.2 + reverse percentage, compound interest, quadratic inequalities</div>
+      </div>
+      <div style="background: var(--bg-content); padding: 14px 16px; border-radius: 8px;">
+        <div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--ink-muted); letter-spacing: 1px; margin-bottom: 4px;">PHASE 2 · WK 3-4</div>
+        <div style="font-family: 'Source Serif 4', serif; font-weight: 600; font-size: 14px; margin-bottom: 4px;">Conceptual scaffolding</div>
+        <div style="font-size: 12px; color: var(--ink-secondary);">bearings, similar solids, quadratic formula, indep events</div>
+      </div>
+      <div style="background: var(--bg-content); padding: 14px 16px; border-radius: 8px;">
+        <div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--ink-muted); letter-spacing: 1px; margin-bottom: 4px;">PHASE 3 · WK 5-6</div>
+        <div style="font-family: 'Source Serif 4', serif; font-weight: 600; font-size: 14px; margin-bottom: 4px;">Metacognitive calibration</div>
+        <div style="font-size: 12px; color: var(--ink-secondary);">Runs in parallel with Phases 1-2 · predict-verify training</div>
+      </div>
+      <div style="background: var(--bg-content); padding: 14px 16px; border-radius: 8px;">
+        <div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--ink-muted); letter-spacing: 1px; margin-bottom: 4px;">PHASE 4 · WK 7-8</div>
+        <div style="font-family: 'Source Serif 4', serif; font-weight: 600; font-size: 14px; margin-bottom: 4px;">Integration + simulation</div>
+        <div style="font-size: 12px; color: var(--ink-secondary);">Interleaved practice, stamina, full-length CEM simulation</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Sec 9: Methodology ===== -->
+<section id="sec9" class="section">
+  <div class="section-header">
+    <div class="section-title-block">
+      <div class="section-eyebrow">§⑨ METHODOLOGY</div>
+      <h1>Sources, decision criteria, and limitations</h1>
+      <p class="section-subtitle">The basis and boundaries of every judgement, transparent for peer review.</p>
+    </div>
+  </div>
+  <div class="methodology-block">
+    <details open>
+      <summary>Knowledge Graph MCP query workflow</summary>
+      <div>
+        Each standard is resolved through three live API calls:<br>
+        <strong>(1)</strong> <code>find_standard_statement</code> with the <code>Multi-State</code> jurisdiction. Key finding: high-school standards (Grades 9-12) require the <code>HS</code> prefix.<br>
+        <strong>(2)</strong> <code>find_learning_components_from_standard</code> using the CASE network UUID. Key finding: the official ANet decomposition differs substantially from an intuitive partition. <code>HSA-REI.B.4.b</code> has 7 official LCs, and "method selection" is its own component.<br>
+        <strong>(3)</strong> <code>find_standards_progression_from_standard</code> with forward/backward direction. Key correction: the v1 hypothesis that <code>8.EE.A.1</code> was the bottleneck was empirically rejected — its forward chain points to logarithms and scientific notation. The verified bottleneck is <code>7.EE.A.2</code>, with a fan-out of 4 into the SSE family.
+      </div>
+    </details>
+    <details>
+      <summary>Consolidation gradient grading criteria</summary>
+      <div><strong>Robust:</strong> correct across ≥ 2 independent items and conditions.<br><strong>Emerging:</strong> correct under standard conditions.<br><strong>Recognised but unstable:</strong> conceptual representation present but execution unstable.<br><strong>Introduced not internalised:</strong> conceptual structure not yet formed.</div>
+    </details>
+    <details>
+      <summary>Performance vs knowledge gap attribution</summary>
+      <div>Four signals: (1) method visible on paper; (2) a similar item answered correctly earlier; (3) error pattern matches the cognitive-overload signature; (4) cross-test counter-evidence. The framework is based on Newman's (1977) error-analysis hierarchy.</div>
+    </details>
+    <details>
+      <summary>Limitations of CCSS-Edexcel mapping</summary>
+      <div>Bearings was initially mapped to <code>7.G.A.2</code>, which the API showed to be inappropriate. Similar solids was initially mapped to <code>HSG-MG.A.1</code>, which the API also rejected. CCSS contains no standard that specifically covers these two Edexcel-only topics. Methodological implication: when Mindsweeper uses CCSS as the backbone, Edexcel-only topics should be marked as placeholders.</div>
+    </details>
+    <details>
+      <summary>Scope and limitations</summary>
+      <div>① The standards backbone is CCSS-M; the student's actual curriculum is Edexcel GCSE 9-1 Foundation.<br>② The standards progression chain reflects logical prerequisite relationships, not necessarily instructional order.<br>③ Trait and factor analyses are based on roughly four weeks of data and constitute working hypotheses rather than settled conclusions.<br>④ Performance-versus-knowledge attribution involves judgement; every attribution is accompanied by explicit evidence.<br>⑤ LVN strategies have population-level research support; individual responses vary.</div>
+    </details>
+  </div>
+</section>
+
+<!-- ===== Tool: New test entry ===== -->
+<section id="tool-newtest" class="section">
+  <div class="section-header">
+    <div class="section-title-block">
+      <div class="section-eyebrow">TOOL · NEW DIAGNOSTIC INPUT</div>
+      <h1>Enter a new test</h1>
+      <p class="section-subtitle">Once submitted, the system uses the Learning Commons API to automatically verify each item's CCSS anchor, retrieve learning components, and compute the progression chain, generating a draft report. The teacher reviews and edits before publishing.</p>
+    </div>
+    <div class="section-actions">
+      <button class="btn btn-ghost">Import from template</button>
+      <button class="btn btn-primary">Generate draft report</button>
+    </div>
+  </div>
+  <div class="form-block">
+    <div class="field-row">
+      <div class="field"><label>Test name</label><input type="text" value="PT3 · Cambridge CEM Mock 1"></div>
+      <div class="field"><label>Test date</label><input type="date" value="2026-05-25"></div>
+    </div>
+    <div class="field-row">
+      <div class="field"><label>Course / scope</label>
+        <select><option>Edexcel GCSE 9-1 Foundation</option><option>Edexcel GCSE 9-1 Higher</option><option>Cambridge CEM Year 9</option><option>IB MYP 5</option></select>
+      </div>
+      <div class="field"><label>Conditions</label>
+        <select><option>Non-calculator · timed</option><option>Calculator · timed</option><option>Non-calculator · untimed</option></select>
+      </div>
+    </div>
+    <div style="margin-top: 24px; padding-top: 18px; border-top: 1px solid var(--border);">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+        <h3 style="font-size: 14px;">Item entry</h3>
+        <button class="btn btn-secondary">+ Add item</button>
+      </div>
+      <div class="item-row">
+        <input type="text" value="Q22a">
+        <select><option>HSA-SSE.B.3.c</option><option>7.EE.A.2</option><option>(auto-suggest)</option></select>
+        <select><option>0/2</option><option>1/2</option><option>2/2</option></select>
+        <input type="text" value="wrote 0.15 instead of 0.85">
+        <button class="item-remove">✕</button>
+      </div>
+      <div class="item-row">
+        <input type="text" value="Q23">
+        <select><option>HSA-REI.B.4.b</option><option>(auto-suggest)</option></select>
+        <select><option>0/3</option><option>1/3</option><option>2/3</option><option>3/3</option></select>
+        <input type="text" value="quadratic formula not applied, attempted factoring">
+        <button class="item-remove">✕</button>
+      </div>
+      <div class="item-row">
+        <input type="text" placeholder="Q…">
+        <select><option>(auto-suggest)</option></select>
+        <select><option>—</option></select>
+        <input type="text" placeholder="Error description">
+        <button class="item-remove">✕</button>
+      </div>
+    </div>
+    <div style="margin-top: 24px; padding: 14px 16px; background: var(--blue-bg); border: 1px solid var(--blue-border); border-radius: 8px; font-size: 12.5px; color: var(--ink-secondary); line-height: 1.7;">
+      <strong style="color: var(--blue);">What happens next:</strong> after you click "Generate draft report", the system runs three Learning Commons API calls for each CCSS code, classifies the error descriptions automatically using the §② attribution taxonomy, identifies candidate bottleneck nodes, and finally produces a draft with the same structure as this report. The teacher can edit any field before publishing.
+    </div>
+  </div>
+</section>
+
+<!-- ===== Tool: Verify standards ===== -->
+<section id="tool-verify" class="section">
+  <div class="section-header">
+    <div class="section-title-block">
+      <div class="section-eyebrow">TOOL · STANDARD VERIFICATION</div>
+      <h1>Learning Commons verification</h1>
+      <p class="section-subtitle">All CCSS standards, learning components, and progression chains cited in this report originate from Learning Commons MCP. From here you can batch re-verify; the system automatically diffs against the previous run.</p>
+    </div>
+    <div class="section-actions">
+      <button class="btn btn-primary">Re-verify all (14)</button>
+    </div>
+  </div>
+  <div class="data-table">
+    <div class="table-toolbar">
+      <span class="filter-chip active">All 14</span>
+      <span class="filter-chip">Verified 12</span>
+      <span class="filter-chip">Needs review 0</span>
+      <span class="filter-chip">No anchor 2</span>
+      <span class="filter-spacer"></span>
+      <span class="filter-count">Last run: 20 May 14:32</span>
+    </div>
+    <div style="padding: 14px 16px;">
+      <div style="display: grid; grid-template-columns: 150px 1fr 100px 100px; gap: 14px; padding: 10px 0; border-bottom: 1px solid var(--border); align-items: center; font-size: 12px;">
+        <code style="font-family: 'JetBrains Mono', monospace; font-weight: 600;">7.EE.A.2</code>
+        <span>Rewrite expressions to reveal relationships</span>
+        <span class="kg-live"><span class="dot"></span>5/20 14:32</span>
+        <span class="badge ok" style="justify-self: end;">verified</span>
+      </div>
+      <div style="display: grid; grid-template-columns: 150px 1fr 100px 100px; gap: 14px; padding: 10px 0; border-bottom: 1px solid var(--border); align-items: center; font-size: 12px;">
+        <code style="font-family: 'JetBrains Mono', monospace; font-weight: 600;">HSA-SSE.B.3.c</code>
+        <span>Properties of exponents for exponential functions</span>
+        <span class="kg-live"><span class="dot"></span>5/20 14:32</span>
+        <span class="badge ok" style="justify-self: end;">verified</span>
+      </div>
+      <div style="display: grid; grid-template-columns: 150px 1fr 100px 100px; gap: 14px; padding: 10px 0; border-bottom: 1px solid var(--border); align-items: center; font-size: 12px;">
+        <code style="font-family: 'JetBrains Mono', monospace; font-weight: 600;">HSA-REI.B.4.b</code>
+        <span>Solving quadratic equations (7 LCs)</span>
+        <span class="kg-live"><span class="dot"></span>5/20 14:32</span>
+        <span class="badge ok" style="justify-self: end;">verified</span>
+      </div>
+      <div style="display: grid; grid-template-columns: 150px 1fr 100px 100px; gap: 14px; padding: 10px 0; border-bottom: 1px solid var(--border); align-items: center; font-size: 12px;">
+        <code style="font-family: 'JetBrains Mono', monospace; font-weight: 600; color: var(--ink-muted);">Edexcel · bearings</code>
+        <span style="color: var(--ink-muted);">No CCSS anchor — flagged</span>
+        <span style="font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--ink-muted);">—</span>
+        <span class="badge warning" style="justify-self: end;">no anchor</span>
+      </div>
+      <div style="display: grid; grid-template-columns: 150px 1fr 100px 100px; gap: 14px; padding: 10px 0; align-items: center; font-size: 12px;">
+        <code style="font-family: 'JetBrains Mono', monospace; font-weight: 600; color: var(--ink-muted);">Edexcel · similar solids</code>
+        <span style="color: var(--ink-muted);">No CCSS anchor — flagged</span>
+        <span style="font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--ink-muted);">—</span>
+        <span class="badge warning" style="justify-self: end;">no anchor</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Tool: Parent preview ===== -->
+<section id="tool-parent" class="section">
+  <div class="section-header">
+    <div class="section-title-block">
+      <div class="section-eyebrow">TOOL · PARENT-FACING VIEW</div>
+      <h1>Parent-facing preview</h1>
+      <p class="section-subtitle">The same diagnostic data in a different register. No CCSS codes or jargon stacking — the focus is on "what this means and what we will do in the next two weeks". Requires teacher review before being sent.</p>
+    </div>
+    <div class="section-actions">
+      <button class="btn btn-ghost">Copy link</button>
+      <button class="btn btn-secondary">Edit</button>
+      <button class="btn btn-primary">Send to parents</button>
+    </div>
+  </div>
+  <div class="parent-preview-wrap">
+    <div class="parent-preview-meta">
+      <span style="font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: var(--blue); font-weight: 600;">PREVIEW</span>
+      <span>This is what parents will see when they open the link · as of 25 May · reviewed by Paula Zheng</span>
+    </div>
+    <div class="parent-greeting">Dear Yu family,</div>
+    <div class="parent-block">The diagnostics over the past eight weeks give us a clear picture: <strong>Xiao Ting's mathematical foundation is actually quite solid — algebraic manipulation, Pythagoras, ratio, and functions are all in good shape</strong>. The places where she is currently losing marks <strong>are not "things she doesn't know"</strong>; they trace to one specific conceptual gate and a handful of execution issues during testing.</div>
+    <div class="parent-callout">
+      <strong>Core finding:</strong> what Xiao Ting needs to address is not a long list of topics but <strong>one key "translation" move</strong> — translating additive language such as "decrease by 15%" into multiplicative language such as "multiply by 0.85". Repairing this single concept simultaneously resolves four downstream item families: compound interest, reverse percentage, quadratic equations, and similar.
+    </div>
+    <div style="font-family: 'Source Serif 4', serif; font-size: 16px; font-weight: 600; margin-top: 24px; margin-bottom: 10px;">What we will do in the next two weeks (Phase 1)</div>
+    <ol class="parent-next-list">
+      <li><span class="num">1</span><span>Use a <strong>6-card error-example deck</strong> to train the "+5% is equivalent to ×1.05" conversion. Each time she begins with a flawed solution and has to identify where it went wrong — substantially more effective than handing her the correct solution to memorise.</span></li>
+      <li><span class="num">2</span><span>Fifteen minutes per session of <strong>verbal reasoning</strong>. Have her explain aloud "why the multiplier is 0.85 and not 0.15". Do not interrupt when she gets stuck — the struggle itself is where learning happens.</span></li>
+      <li><span class="num">3</span><span>Establish a "<strong>three-step paper rule</strong>": for any multi-step problem, first write "given — required — method", then begin computing. The goal is for this to become automatic within two weeks.</span></li>
+    </ol>
+    <div style="font-family: 'Source Serif 4', serif; font-size: 16px; font-weight: 600; margin-top: 24px; margin-bottom: 10px;">How parents can support</div>
+    <div class="parent-block">
+      <strong>No need</strong> for additional drill volume. Xiao Ting already does enough problems; what she needs is to work each one through thoroughly. When she gets an item wrong, rather than asking "why did you get it wrong?" ask "if you did it again, what would you do differently?" These are metacognitive prompts and have very strong research support.<br><br>
+      At the end of Phase 1 (around 8 June) there will be an 8-item diagnostic checkpoint with a target of ≥ 75%. I will send a brief progress update at that point.
+    </div>
+    <div style="margin-top: 28px; padding-top: 18px; border-top: 1px solid var(--border); font-size: 12px; color: var(--ink-muted); line-height: 1.7;">
+      Would you like to see more detail? The teacher-facing report contains per-item attribution, the standards progression graph, the underlying research, and other technical detail. If you would like a walkthrough, we can schedule a 30-minute video call.<br>— Paula
+    </div>
+  </div>
+</section>
+
+</main>
+</div>
+</div>
+
+<script>
+// === Navigation ===
+const navItems = document.querySelectorAll('.nav-item');
+const sections = document.querySelectorAll('.section');
+function showSection(id) {
+  navItems.forEach(n => n.classList.toggle('active', n.dataset.target === id));
+  sections.forEach(s => s.classList.toggle('active', s.id === id));
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  if (id === 'trajectory') setTimeout(renderTraj, 50);
+  if (id === 'mssessions') setTimeout(() => { if (window.msRenderChart) window.msRenderChart(); }, 50);
+}
+navItems.forEach(item => {
+  item.addEventListener('click', () => showSection(item.dataset.target));
+});
+
+// === Trajectory chart ===
+let trajChart = null;
+function renderTraj() {
+  const ctx = document.getElementById('traj-chart');
+  if (!ctx || trajChart) return;
+  trajChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: ['11 Mar', '25 Mar', '1 Apr', '7 May', 'Wk 2 ✓', 'Wk 4 ✓', 'Wk 6 ✓', 'Wk 8 final'],
+      datasets: [{
+        label: 'Score %',
+        data: [32, 71, 56, 56, null, null, null, null],
+        borderColor: '#1c1917',
+        backgroundColor: 'rgba(28,25,23,0.06)',
+        borderWidth: 2,
+        tension: 0.2,
+        pointBackgroundColor: '#1c1917',
+        pointRadius: 5,
+        pointHoverRadius: 7,
+        spanGaps: false,
+        fill: true
+      }, {
+        label: 'Target',
+        data: [null, null, null, 56, 75, 80, 85, 85],
+        borderColor: '#166534',
+        borderDash: [4, 4],
+        borderWidth: 1.5,
+        pointRadius: 3,
+        pointBackgroundColor: '#166534',
+        fill: false,
+        tension: 0.1
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'bottom', labels: { font: { family: 'Inter', size: 12 }, color: '#57534e' } }
+      },
+      scales: {
+        y: { min: 0, max: 100, ticks: { font: { family: 'JetBrains Mono', size: 10 }, color: '#a8a29e', callback: v => v + '%' }, grid: { color: '#e7e5e0' } },
+        x: { ticks: { font: { family: 'JetBrains Mono', size: 10 }, color: '#a8a29e' }, grid: { display: false } }
+      }
+    }
+  });
+}
+
+// === Topic table (Section 1) ===
+const topics = [
+  { name: 'Similar solids (area/volume scaling)', code: 'No CCSS anchor — Edexcel-specific', score: 0, status: 'critical', label: 'Intervene', evidence: 'PT2-Q22 · introduced not internalised. CCSS has no clean anchor.' },
+  { name: 'Compound percentage / decay', code: 'HSA-SSE.B.3.c', score: 0, status: 'critical', label: 'Intervene', evidence: 'PT1-Q22a: wrote 0.15 instead of 0.85; Q22b: formula correct but computed as 9900 (should be 11054). Downstream of bottleneck 7.EE.A.2.' },
+  { name: 'Bearings', code: 'No CCSS anchor — Edexcel-specific', score: 0, status: 'critical', label: 'Intervene', evidence: 'PT2-Q3: computed 180−65 rather than 65+180 — direction inverted.' },
+  { name: 'Quadratic formula (non-factorisable)', code: 'HSA-REI.B.4.b', score: 0, status: 'critical', label: 'Intervene', evidence: 'PT2-Q23: did not switch to the formula method. "Method selection" is its own LC in the ANet decomposition.' },
+  { name: 'Independent events · complement logic', code: '7.SP.C.8', score: 50, status: 'warning', label: 'Watch', evidence: 'Basic probability stable; complement and tree extensions unstable.' },
+  { name: 'Quadratic inequalities · sign analysis', code: 'HSA-REI.B.4.b', score: 50, status: 'warning', label: 'Watch', evidence: 'PT2-Q1 double-picked A and C, ultimately chose the wrong one — second-guessing under anxiety.' },
+  { name: 'Unit conversion (speed)', code: '6.RP.A.3.d', score: 50, status: 'warning', label: 'Watch', evidence: 'PT2-Q19c: m/s → km/h requiring ×3.6 not yet fluent. Same conceptual move as the bottleneck.' },
+  { name: '2-D shape properties (rhombus/rectangle)', code: '5.G.B.4', score: 50, status: 'warning', label: 'Watch', evidence: 'Basic concept present; edge-case judgement weak.' },
+  { name: 'Algebraic manipulation (incl. expansion)', code: 'HSA-SSE.A.2', score: 100, status: 'ok', label: 'Strength', evidence: 'Expansion, combining, and simplification all stable.' },
+  { name: 'Pythagoras and basic trigonometry', code: '8.G.B.7 / HSG-SRT.C.8', score: 100, status: 'ok', label: 'Strength', evidence: 'PT2-Q13 and Q23a all correct.' },
+  { name: 'Ratio and proportion', code: '7.RP.A.2 / 7.RP.A.3', score: 90, status: 'ok', label: 'Strength', evidence: '4 items all correct — her most stable area.' },
+  { name: 'Simultaneous equations and function evaluation', code: 'HSA-REI.C.6 / 8.F.A.1', score: 100, status: 'ok', label: 'Strength', evidence: 'PT1-Q9 correct.' }
+];
+function renderTopics(filter) {
+  filter = filter || 'all';
+  const wrap = document.getElementById('topic-rows');
+  if (!wrap) return;
+  const filtered = filter === 'all' ? topics : topics.filter(t => t.status === filter);
+  wrap.innerHTML = filtered.map(t => `
+    <div class="topic-row">
+      <div><div class="topic-name">${t.name}</div><div class="topic-code">${t.code}</div></div>
+      <div class="topic-bar-wrap"><div class="topic-bar ${t.status}" style="width: ${t.score}%"></div></div>
+      <div class="topic-score ${t.status}">${t.score}%</div>
+      <div><span class="badge ${t.status}">${t.label}</span></div>
+      <div class="topic-expand">${t.evidence}</div>
+    </div>`).join('');
+  wrap.querySelectorAll('.topic-row').forEach(r => {
+    r.addEventListener('click', () => r.classList.toggle('expanded'));
+  });
+}
+renderTopics();
+
+// ═══════════════════════════════════════════════════════════════════════════
+// MINDSWEEPER LONGITUDINAL BRIDGE
+// Reads the per-student session history written by the Mindsweeper agent (same
+// localStorage contract, same origin) and renders the cross-session view.
+// Purely additive: the rich example dashboard remains the default view.
+// ═══════════════════════════════════════════════════════════════════════════
+(function () {
+  const MS_KEYS = { index: "mindsweeper:index", student: (id) => `mindsweeper:student:${id}` };
+  const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  // Demo dashboard: check sessionStorage first (the demo agent writes there so nothing persists
+  // beyond the tab session), then fall back to localStorage for anything the live agent may have
+  // pushed. For the student bucket we also MERGE sessions from both stores so a demo session
+  // shows on top of any prior localStorage history.
+  const readRaw = (store, k) => { try { return JSON.parse(store.getItem(k) || "null"); } catch { return null; } };
+  const read = (k) => {
+    try {
+      const ss = readRaw(sessionStorage, k);
+      const ls = readRaw(localStorage, k);
+      // Merge the index arrays (dedupe by studentId, prefer sessionStorage lastUpdated)
+      if (k === MS_KEYS.index && Array.isArray(ss) && Array.isArray(ls)) {
+        const byId = new Map();
+        ls.forEach(e => byId.set(e.studentId, e));
+        ss.forEach(e => byId.set(e.studentId, { ...(byId.get(e.studentId) || {}), ...e }));
+        return Array.from(byId.values());
+      }
+      // Merge student buckets: sessions list from both, deduped by session_id, newest last
+      if (ss && ls && typeof ss === 'object' && typeof ls === 'object' && Array.isArray(ss.sessions) && Array.isArray(ls.sessions)) {
+        const seen = new Set(), merged = [];
+        [...ls.sessions, ...ss.sessions].forEach(s => { const id = s.session_id || JSON.stringify(s.timestamp); if (!seen.has(id)) { seen.add(id); merged.push(s); } });
+        return { ...ls, ...ss, sessions: merged };
+      }
+      return ss || ls;
+    } catch { return null; }
+  };
+
+  const normRAI = (v) => v == null ? null : Math.round(((v + 10) / 20) * 100);
+  const normMeta = (koc, roc) => { const vs = [koc, roc].filter(x => x != null); if (!vs.length) return null; return Math.round((((vs.reduce((a,b)=>a+b,0)/vs.length) - 1) / 4) * 100); };
+  const normRes = (sum) => sum == null ? null : Math.round(((sum - 10) / 40) * 100);
+
+  let chart = null, current = null;
+  const getIndex = () => read(MS_KEYS.index) || [];
+
+  function pickInitialStudentId() {
+    const m = (location.hash || "").match(/student=([^&]+)/);
+    if (m) return decodeURIComponent(m[1]);
+    const idx = getIndex();
+    if (!idx.length) return null;
+    return idx.slice().sort((a,b) => String(b.lastUpdated).localeCompare(String(a.lastUpdated)))[0].studentId;
+  }
+  function loadStudent(id) { current = read(MS_KEYS.student(id)); render(); }
+  function fmtDate(iso) { try { return new Date(iso).toLocaleDateString(undefined, { day:'numeric', month:'short', year:'numeric' }); } catch { return iso; } }
+
+  function renderSelect() {
+    const sel = document.getElementById('ms-student-select');
+    const idx = getIndex();
+    if (!sel) return;
+    if (!idx.length) { sel.style.display = 'none'; return; }
+    sel.style.display = '';
+    sel.innerHTML = idx.slice().sort((a,b)=>String(b.lastUpdated).localeCompare(String(a.lastUpdated)))
+      .map(e => `<option value="${esc(e.studentId)}"${current && e.studentId===current.studentId?' selected':''}>${esc(e.name)}${e.grade?' · '+esc(e.grade):''} (${e.sessionCount})</option>`).join('');
+    sel.onchange = () => loadStudent(sel.value);
+  }
+
+  function classifyGaps(sessions) {
+    if (!sessions.length) return { closed: [], persisting: [], appeared: [] };
+    const latest = sessions[sessions.length - 1];
+    const prev = sessions.length > 1 ? sessions[sessions.length - 2] : { topic_gaps: [] };
+    const norm = (g) => String(g).trim().toLowerCase();
+    const latestSet = new Set((latest.topic_gaps||[]).map(norm));
+    const prevSet = new Set((prev.topic_gaps||[]).map(norm));
+    return {
+      closed: (prev.topic_gaps||[]).filter(g => !latestSet.has(norm(g))),
+      appeared: (latest.topic_gaps||[]).filter(g => !prevSet.has(norm(g))),
+      persisting: (latest.topic_gaps||[]).filter(g => prevSet.has(norm(g))),
+    };
+  }
+
+  function renderGaps() {
+    const el = document.getElementById('ms-gaps');
+    if (!el || !current) return;
+    const s = current.sessions;
+    const { closed, persisting, appeared } = classifyGaps(s);
+    const single = s.length <= 1;
+    const block = (title, items, color, bg, icon, emptyMsg) => `
+      <div style="margin-bottom:14px;">
+        <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.6px; color:${color}; margin-bottom:6px;">${icon} ${esc(title)} (${items.length})</div>
+        ${items.length ? items.map(g => `<div style="display:flex; gap:9px; padding:7px 10px; background:${bg}; border-radius:7px; margin-bottom:4px; font-size:13px; color:var(--ink); align-items:flex-start;"><span style="color:${color}; font-weight:700;">${icon}</span><span>${esc(g)}</span></div>`).join('') : `<div style="font-size:12px; color:var(--ink-tertiary); font-style:italic; padding:2px 0;">${esc(emptyMsg)}</div>`}
+      </div>`;
+    el.innerHTML =
+      (single ? `<div style="font-size:12.5px; color:var(--ink-secondary); margin-bottom:12px; padding:8px 12px; background:var(--blue-bg); border:1px solid var(--blue-border); border-radius:7px;">Only one session so far — gaps below are the current picture. After the next session, this panel shows which gaps closed, which persist, and which are new.</div>` : '') +
+      block('Closed since last session', closed, '#166534', 'rgba(22,101,52,0.07)', '✓', 'None closed yet') +
+      block('Still persisting', persisting, '#b45309', 'rgba(180,83,9,0.07)', '→', 'None persisting') +
+      block(single ? 'Current gaps' : 'Newly appeared', appeared, '#b91c1c', 'rgba(185,28,28,0.06)', single ? '•' : '＋', single ? 'None recorded' : 'None new');
+  }
+
+  function renderTimeline() {
+    const el = document.getElementById('ms-timeline');
+    if (!el || !current) return;
+    const s = current.sessions.slice().reverse();
+    el.innerHTML = s.map((rec, i) => {
+      const n = current.sessions.length - i;
+      const m3 = rec.m3 || {};
+      const chips = [];
+      if (m3.motivation_band) chips.push(`Motivation: ${esc(m3.motivation_band)}${m3.motivation_rai!=null?` (RAI ${m3.motivation_rai})`:''}`);
+      if (m3.metacognition_band) chips.push(`Metacognition: ${esc(m3.metacognition_band)}`);
+      if (m3.resilience_band) chips.push(`Resilience: ${esc(m3.resilience_band)}${m3.resilience_sum!=null?` (${m3.resilience_sum}/50)`:''}`);
+      if (m3.mindset) chips.push(`Mindset: ${esc(String(m3.mindset).replace(/_/g,' '))}`);
+      return `
+      <div style="border-left:2px solid var(--border); padding:0 0 18px 18px; position:relative;">
+        <div style="position:absolute; left:-7px; top:2px; width:12px; height:12px; border-radius:50%; background:#166534; border:2px solid var(--bg);"></div>
+        <div style="display:flex; justify-content:space-between; align-items:baseline; gap:10px; flex-wrap:wrap;">
+          <div style="font-weight:700; font-size:14px; color:var(--ink);">Session ${n}${i===0?' · latest':''}</div>
+          <div style="font-size:11.5px; color:var(--ink-tertiary); font-family:'JetBrains Mono',monospace;">${esc(fmtDate(rec.timestamp))} · ${esc(rec.mode||'')}</div>
+        </div>
+        ${rec.overall_level?`<div style="font-size:12.5px; color:var(--ink-secondary); margin-top:3px;">Knowledge level: <strong>${esc(rec.overall_level)}</strong> · ${(rec.topic_strengths||[]).length} strengths · ${(rec.topic_gaps||[]).length} gaps</div>`:''}
+        ${chips.length?`<div style="display:flex; flex-wrap:wrap; gap:6px; margin-top:8px;">${chips.map(c=>`<span style="font-size:11px; padding:3px 9px; border-radius:10px; background:var(--surface-2,#f5f4f0); color:var(--ink-secondary);">${c}</span>`).join('')}</div>`:''}
+        ${rec.overall_verdict?`<div style="font-size:12px; color:var(--ink-secondary); line-height:1.6; margin-top:8px; padding:8px 11px; background:rgba(22,101,52,0.05); border-radius:7px;">${esc(rec.overall_verdict)}</div>`:''}
+      </div>`;
+    }).join('');
+  }
+
+  window.msRenderChart = function () {
+    if (!current) return;
+    const ctx = document.getElementById('ms-m3-chart');
+    if (!ctx) return;
+    if (chart) { chart.destroy(); chart = null; }
+    const sessions = current.sessions;
+    const labels = sessions.map((s, i) => `S${i+1}`);
+    const mk = (data, label, color) => ({ label, data, borderColor: color, backgroundColor: color+'22', borderWidth: 2, tension: 0.25, pointRadius: 4, pointHoverRadius: 6, pointBackgroundColor: color, spanGaps: true, fill: false });
+    chart = new Chart(ctx, {
+      type: 'line',
+      data: { labels, datasets: [
+        mk(sessions.map(s => normRAI(s.m3?.motivation_rai)), 'Motivation', '#7c3aed'),
+        mk(sessions.map(s => normMeta(s.m3?.metacognition_koc, s.m3?.metacognition_roc)), 'Metacognition', '#0369a1'),
+        mk(sessions.map(s => normRes(s.m3?.resilience_sum)), 'Resilient disposition', '#166534'),
+      ]},
+      options: { responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false },
+        plugins: { legend: { position: 'bottom', labels: { font: { family: 'Inter', size: 12 }, color: '#57534e', usePointStyle: true } } },
+        scales: { y: { min: 0, max: 100, ticks: { font: { family: 'JetBrains Mono', size: 10 }, color: '#a8a29e' }, grid: { color: '#e7e5e0' }, title: { display: true, text: 'Normalised 0–100', font: { family:'Inter', size: 10 }, color:'#a8a29e' } }, x: { ticks: { font: { family: 'JetBrains Mono', size: 10 }, color: '#a8a29e' }, grid: { display: false } } } },
+    });
+  };
+
+  function render() {
+    const empty = document.getElementById('ms-empty');
+    const content = document.getElementById('ms-content');
+    const idx = getIndex();
+    const badge = document.getElementById('ms-nav-badge');
+    if (!idx.length || !current || !current.sessions || !current.sessions.length) {
+      if (empty) empty.style.display = 'block';
+      if (content) content.style.display = 'none';
+      if (badge) badge.style.display = 'none';
+      renderSelect();
+      return;
+    }
+    if (empty) empty.style.display = 'none';
+    if (content) content.style.display = 'block';
+    const title = document.getElementById('ms-title');
+    const sub = document.getElementById('ms-subtitle');
+    const count = document.getElementById('ms-session-count');
+    if (title) title.textContent = `${current.name} — Mindsweeper sessions`;
+    if (sub) sub.textContent = `${current.sessions.length} session${current.sessions.length===1?'':'s'}${current.grade?' · '+current.grade:''}. M³ trajectory and how knowledge gaps change across sessions.`;
+    if (count) count.textContent = `${current.sessions.length} session${current.sessions.length===1?'':'s'}`;
+    if (badge) { badge.style.display = ''; badge.textContent = current.sessions.length; }
+    renderSelect();
+    renderGaps();
+    renderTimeline();
+    const svLink = document.getElementById('ms-student-view-link');
+    if (svLink && current) svLink.href = `./Mindsweeper_Student.html#student=${encodeURIComponent(current.studentId)}`;
+    if (document.getElementById('mssessions').classList.contains('active')) window.msRenderChart();
+  }
+
+  function init() {
+    const id = pickInitialStudentId();
+    if (id) current = read(MS_KEYS.student(id));
+    render();
+    // Deep-link jumps to the Mindsweeper view; otherwise the dashboard stays default.
+    if ((location.hash||'').includes('student=') && typeof showSection === 'function') showSection('mssessions');
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+
+  window.addEventListener('hashchange', () => {
+    const id = pickInitialStudentId();
+    if (id) { current = read(MS_KEYS.student(id)); if (typeof showSection==='function') showSection('mssessions'); render(); }
+  });
+})();
+
+document.querySelectorAll('[data-filter]').forEach(c => {
+  c.addEventListener('click', () => {
+    document.querySelectorAll('[data-filter]').forEach(x => x.classList.remove('active'));
+    c.classList.add('active');
+    renderTopics(c.dataset.filter);
+  });
+});
+
+// === Knowledge tree ===
+const kgData = {
+  "HSA-SSE.B.3.c": { title: "Compound interest and exponential decay", grade: "9-10", status: "critical", score: "0%", code: "HSA-SSE.B.3.c", text: "Use the properties of exponents to transform expressions for exponential functions. For example the expression 1.15^t can be rewritten as (1.15^(1/12))^(12t) ≈ 1.012^(12t).", live: true, evidence: [{q:"PT1-Q22a", n:"wrote 0.15 instead of 0.85 (depreciation multiplier)"},{q:"PT1-Q22b", n:"method 18000×0.85³ correct, computed 9900 (true ≈ 11054)"}], lcs: ["Use properties of exponents to write an equivalent form of an exponential function"], traces: "7.EE.A.2" },
+  "Similar solids": { title: "Similar solids · k²/k³ scaling", grade: "9-10", status: "critical", score: "0%", code: "Edexcel-specific", text: "Surface area scales as k² and volume as k³ for similar 3-D figures. CCSS has no clean anchor.", edexcel: true, evidence: [{q:"PT2-Q22", n:"introduced not internalised — could not map problem onto scaling rule"}] },
+  "HSA-REI.B.4.b": { title: "Solving quadratic equations", grade: "9-10", status: "critical", score: "partial", code: "HSA-REI.B.4.b", text: "Solve quadratic equations by inspection, taking square roots, completing the square, the quadratic formula and factoring.", live: true, evidence: [{q:"PT1-Q21a", n:"factoring done mentally; working not shown — 2 marks lost"},{q:"PT2-Q23", n:"quadratic formula failed on non-factorisable case"}], lcs: ["Factoring ✓","Quadratic formula ✗","Method selection ✗ (its own LC)","Completing square — untested"] },
+  "Bearings": { title: "Bearings", grade: "9-10", status: "critical", score: "0%", code: "Edexcel-specific", text: "Compass-based angle measurement. Back bearing = original ± 180°.", edexcel: true, evidence: [{q:"PT2-Q3", n:"computed 180−65 instead of 65+180 — confused subtraction direction"}] },
+  "HSA-SSE.A.1": { title: "Interpret expressions in context", grade: "9-10", status: "downstream", code: "HSA-SSE.A.1", text: "Interpret expressions that represent a quantity in terms of its context.", live: true, note: "Forward downstream from 7.EE.A.2." },
+  "HSA-SSE.B.3.a": { title: "Factor to reveal zeros", grade: "9-10", status: "downstream", code: "HSA-SSE.B.3.a", text: "Factor a quadratic expression to reveal the zeros of the function it defines.", live: true, note: "Forward downstream from 7.EE.A.2." },
+  "HSA-SSE.B.3.b": { title: "Complete the square to reveal extrema", grade: "9-10", status: "downstream", code: "HSA-SSE.B.3.b", text: "Complete the square in a quadratic expression to reveal the maximum or minimum value.", live: true, note: "Forward downstream from 7.EE.A.2." },
+  "8.EE.A.1": { title: "Properties of integer exponents", grade: "8", status: "ok", code: "8.EE.A.1", evidence: [{q:"PT1-Q4", n:"2⁵ = 32 — correct"}], note: "v1 hypothesis: this was the bottleneck. The SAP forward chain in fact points to logarithms / scientific notation. The hypothesis was rejected by the API." },
+  "8.G.B.7": { title: "Pythagorean theorem", grade: "8", status: "ok", code: "8.G.B.7", evidence: [{q:"PT2-Q13", n:"correct"},{q:"PT2-Q23a", n:"correct"}] },
+  "8.F.A.1": { title: "Functions and evaluation", grade: "8", status: "ok", code: "8.F.A.1", evidence: [{q:"PT1-Q9", n:"correct"}] },
+  "8.F.B.4": { title: "Linear function rate of change", grade: "8", status: "prerequisite", code: "8.F.B.4", note: "Prerequisite — not directly tested." },
+  "7.EE.A.2": { title: "Rewriting expressions to reveal relationships", grade: "7", status: "bottleneck", code: "7.EE.A.2", text: "Understand that rewriting an expression in different forms in a problem context can shed light on the problem. For example, a + 0.05a = 1.05a means that 'increase by 5%' is the same as 'multiply by 1.05.'", live: true, fanOut: [{c:"HSA-SSE.A.1", n:"Interpret expressions in context"},{c:"HSA-SSE.B.3.a", n:"Factor to reveal zeros"},{c:"HSA-SSE.B.3.b", n:"Complete the square"},{c:"HSA-SSE.B.3.c", n:"Exponential transforms (Q22)"}], evidence: [{q:"PT1-Q22a", n:"wrote 0.15 instead of 0.85 — textbook 7.EE.A.2 failure"}], lcs: ["Rewrite an expression in different forms in a problem context","Interpret how quantities in an expression are related ✗ (the core gap)"], note: "SAP-verified root node: no upstream prerequisite in the Coherence Map. Fan-out = 4. The three currently hidden Grade 9-10 nodes will appear when this node is clicked." },
+  "7.RP.A.2": { title: "Proportional relationships", grade: "7", status: "ok", code: "7.RP.A.2", evidence: [{q:"PT2-Q4", n:"correct"},{q:"PT2-Q5", n:"correct"},{q:"PT2-Q6", n:"correct"},{q:"PT2-Q21", n:"correct"}] },
+  "7.RP.A.3": { title: "Multi-step ratio and percent problems", grade: "7", status: "warning", score: "unstable", code: "7.RP.A.3", evidence: [{q:"PT1-Q11", n:"Reverse-percentage method correct; chained multiplication miscalculated under non-calculator conditions"}], lcs: ["Multi-step ratio problems ✓","Multi-step percent problems — taught but unstable under pressure"] },
+  "7.SP.C.8": { title: "Compound event probability", grade: "7", status: "prerequisite", code: "7.SP.C.8", note: "Independent events is its own LC. PT2 shows 50% — recognised but unstable." },
+  "6.RP.A.1": { title: "Ratio concept and simplification", grade: "6", status: "ok", code: "6.RP.A.1", evidence: [{q:"PT2-Q4", n:"correct"},{q:"PT2-Q21a", n:"correct"}] },
+  "6.NS.B.4": { title: "HCF and LCM", grade: "6", status: "ok", code: "6.NS.B.4", evidence: [{q:"PT1-Q2", n:"correct"},{q:"PT1-Q3", n:"correct"}] },
+  "6.RP.A.3.d": { title: "Unit conversion via ratio reasoning", grade: "6", status: "warning", score: "partial", code: "6.RP.A.3.d", evidence: [{q:"PT2-Q19c", n:"m/s → km/h requires ×3.6 — not yet fluent"}], note: "Same conceptual move as 7.EE.A.2. Train alongside it during Phase 1." },
+  "6.G.A.2": { title: "Volume formulas and 3-D geometry", grade: "6", status: "prerequisite", code: "6.G.A.2", note: "Foundation for similar-solid reasoning." }
+};
+
+const kgDetailEl = document.getElementById('kg-detail');
+function esc(s) { return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function statusChip(d) {
+  if (d.status === 'critical') return '<span class="kg-legend-chip c-r">Critical · ' + esc(d.score || 'gap') + '</span>';
+  if (d.status === 'warning') return '<span class="kg-legend-chip c-a">Unstable · ' + esc(d.score || 'partial') + '</span>';
+  if (d.status === 'ok') return '<span class="kg-legend-chip c-g">Robust</span>';
+  if (d.status === 'prerequisite') return '<span class="kg-legend-chip c-n">Prerequisite</span>';
+  if (d.status === 'bottleneck') return '<span class="kg-legend-chip c-k">Bottleneck · fan-out 4</span>';
+  if (d.status === 'downstream') return '<span class="kg-legend-chip" style="background:var(--blue-bg);color:var(--blue);border-color:var(--blue-border);">Downstream</span>';
+  return '';
+}
+function renderKgDetail(id) {
+  const d = kgData[id];
+  if (!d || !kgDetailEl) return;
+  let html = '<h4>' + esc(d.title) + ' ' + statusChip(d) + '</h4>';
+  html += '<div class="kg-meta-line"><span>' + esc(d.code) + '</span><span>·</span><span>Grade ' + esc(d.grade) + '</span>';
+  if (d.edexcel) html += '<span>·</span><span>Edexcel-only</span>';
+  if (d.live) html += '<span class="kg-live"><span class="dot"></span>Verified live</span>';
+  html += '</div>';
+  if (d.text) html += '<div class="kg-desc">' + esc(d.text) + '</div>';
+  if (d.evidence && d.evidence.length) {
+    html += '<div class="kg-section"><div class="kg-section-label">Evidence from this diagnostic</div>';
+    d.evidence.forEach(e => { html += '<div class="kg-evidence"><span class="qid">' + esc(e.q) + '</span>' + esc(e.n) + '</div>'; });
+    html += '</div>';
+  }
+  if (d.lcs && d.lcs.length) {
+    html += '<div class="kg-section"><div class="kg-section-label">Learning components · ANet</div>';
+    d.lcs.forEach(lc => { html += '<div class="kg-lc"><span class="kg-lc-tag">LC</span>' + esc(lc) + '</div>'; });
+    html += '</div>';
+  }
+  if (d.fanOut && d.fanOut.length) {
+    html += '<div class="kg-section"><div class="kg-section-label">Forward fan-out · SAP-verified</div><div class="kg-fanout">';
+    d.fanOut.forEach(f => { html += '<span class="kg-fan-chip" data-jump="' + esc(f.c) + '" title="' + esc(f.n) + '">' + esc(f.c) + '</span>'; });
+    html += '</div></div>';
+  }
+  if (d.traces) {
+    html += '<div class="kg-section"><div class="kg-section-label">Traces back to</div><div class="kg-fanout"><span class="kg-fan-chip" data-jump="' + esc(d.traces) + '">' + esc(d.traces) + ' · bottleneck</span></div></div>';
+  }
+  if (d.note) html += '<div class="kg-section"><div class="kg-section-label">Note</div><div class="kg-note">' + esc(d.note) + '</div></div>';
+  html += '<div class="kg-actions">';
+  if (!d.edexcel) html += '<button class="btn btn-secondary" onclick="alert(\'Re-call Learning Commons API (teacher view will actually execute)\')">↻ Re-verify</button>';
+  html += '<button class="btn btn-secondary" onclick="showSection(\'intervention\')">+ Add to intervention plan</button>';
+  html += '<button class="btn btn-ghost" onclick="showSection(\'tool-parent\')">→ Parent-facing wording</button>';
+  html += '</div>';
+  kgDetailEl.innerHTML = html;
+}
+function showFanOut() {
+  document.querySelectorAll('[data-downstream="1"]').forEach(el => { el.style.display = ''; el.classList.add('fan-highlight'); });
+}
+function hideFanOut() {
+  document.querySelectorAll('[data-downstream="1"]').forEach(el => { el.style.display = 'none'; el.classList.remove('fan-highlight'); });
+}
+document.querySelectorAll('.kg-node').forEach(n => {
+  n.addEventListener('click', () => {
+    const id = n.dataset.id;
+    document.querySelectorAll('.kg-node.active').forEach(x => x.classList.remove('active'));
+    n.classList.add('active');
+    if (id === '7.EE.A.2') showFanOut(); else hideFanOut();
+    renderKgDetail(id);
+    kgDetailEl.scrollIntoView({behavior: 'smooth', block: 'nearest'});
+  });
+});
+if (kgDetailEl) {
+  kgDetailEl.addEventListener('click', e => {
+    const jump = e.target.closest('[data-jump]');
+    if (jump) {
+      const tgt = jump.dataset.jump;
+      const el = document.querySelector('.kg-node[data-id="' + tgt + '"]');
+      if (el) el.click();
+    }
+  });
+}
+
+// === Phase tabs ===
+document.querySelectorAll('.phase-tab').forEach(t => {
+  t.addEventListener('click', () => {
+    document.querySelectorAll('.phase-tab').forEach(x => x.classList.remove('active'));
+    document.querySelectorAll('.phase-panel').forEach(x => x.classList.remove('active'));
+    t.classList.add('active');
+    const pid = 'phase-panel-' + t.dataset.phase;
+    const panel = document.getElementById(pid);
+    if (panel) panel.classList.add('active');
+  });
+});
+
+// === Strategy checkboxes ===
+const checks = document.querySelectorAll('.strat-check');
+function updateP1Progress() {
+  const p1 = document.querySelectorAll('[data-strat^="p1"]');
+  const done = document.querySelectorAll('[data-strat^="p1"].done').length;
+  const pct = Math.round((done / Math.max(p1.length, 1)) * 100);
+  const fill = document.getElementById('p1-progress');
+  const label = document.getElementById('p1-progress-label');
+  if (fill) fill.style.width = pct + '%';
+  if (label) label.textContent = done + '/' + p1.length + ' strategies executed';
+}
+checks.forEach(c => {
+  c.addEventListener('click', () => {
+    c.classList.toggle('done');
+    updateP1Progress();
+  });
+});
+
+</script>
+</body>
+</html>
